@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<include>
+  <scrollview name="grp_face_server" pos="0,0,-0,-0" viewSize="-1,-1" skin="_skin.white_bg">
+
+    <hr name="wnd_rgn" pos="0,0,@2,-0" lineStyle="solid" mode="vertical" colorLine="@color/brown" size="1"/>
+
+    <!--******************************图片比对服务器******************************-->
+    <text pos="20, 20">图片比对服务器</text>
+    <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
+    
+    <radio pos="|-180,35" name="radio_5" id="0" checked="1">百度比对服务器</radio>
+    <edit name="edit_api_key" pos="|-160,60" size="260,26" extend="2" class="cls_edit" cueText="API_KEY"></edit>
+    <edit name="edit_secret_key" pos="|-160,95" size="260,26" extend="2" class="cls_edit" cueText="SECRET_KEY"></edit>
+    <edit name="edit_bd_libname" pos="|-160,130" size="260,26" extend="2" class="cls_edit" cueText="库名"></edit>
+      
+    <radio pos="|-180,165" name="radio_6">深网比对服务器</radio>
+    <edit name="edit_sw_server" pos="|-160,190" size="260,26" extend="2" class="cls_edit" cueText="服务器地址"></edit>
+    <text pos="[5,{0">:</text>
+    <edit name="edit_sw_port" pos="[5,{0" size="60,26" extend="2" class="cls_edit" cueText="端口号"  align="center"></edit>
+    <edit name="edit_sw_libname" pos="|-160,225" size="260,26" extend="2" class="cls_edit" cueText="库名"></edit>
+    <combobox name="cbx_sw_lib"  pos="|-160,260" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+      <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+      </liststyle>
+      <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
+      <items>
+        <item text=" 静态库" />
+        <item text=" 动态库" />
+      </items>
+    </combobox>
+    <radio pos="|-180,{0" name="radio_7" id="1" show="0">深醒比对服务器</radio>
+    <!--******************************图片比对服务器******************************-->
+
+
+    <!--******************************图片上传服务器******************************-->
+    <text pos="20, 290">图片上传服务器</text>
+    <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
+
+    <radio pos="|-180,305" name="radio_8" id="3">图片上传服务器通用版</radio>
+    <!--comboview name="cbv_general_server" class="cls_edit" btnSkin="_skin.sysbtn_drop_large"  pos="|-160,[5" size="260,26" extend="2" align="center" dropDown="0" dropHeight="200" animateTime="100" curSel="-1">
+		  <liststyle class="cls_edit" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+			  <template itemHeight="40" colorHover="#cccccc" colorSelected="#0AB4FA">
+				  <text id="1" pos="5,0">127.0.0.1</text>
+				  <text id="2" pos="5,20" colorText="#ff0000" />
+			  </template>
+		  </liststyle>
+		  <editstyle name="edit_general_server" vcenter="1" colorText="@color/black" align="left" colorBkgnd="#FFFFFF" cueText="服务器地址" cueColor="@color/gray"/>
+	  </comboview-->
+    
+    <edit name="edit_general_server" pos="|-160,330" size="260,26" extend="2" class="cls_edit" cueText="服务器地址"></edit>
+    <text pos="[5,{0">:</text>
+    <edit name="edit_general_port" pos="[5,{0" size="60,26" extend="2" class="cls_edit" cueText="端口号" align="center"></edit>
+ 
+    <text pos="|-160,365" colorText="@color/red">若想将人脸抓拍存至本地图片接收服务器：</text>
+    <link pos="|90,{-3" size="108,26" class="cls_btn_weblink" name="menu_btn_selip" show="1">请点击选取本机IP</link>
+    <link pos="|90,{0" size="108,26" class="cls_btn_weblink" name="menu_btn_hideip" show="0">请点击隐藏IP菜单</link>
+    <text pos="[2,{3" colorText="@color/red">以及</text>
+    <link pos="[2,{-3" size="106,26" class="cls_btn_weblink" name="menu_btn_selport">读取服务器端口号</link>
+  
+
+    <radio pos="|-180,395" name="radio_9" id="4">图片上传服务器Iermu版</radio>
+    <edit  name="edit_iermu_server" pos="|-160,420" size="260,26" extend="2" class="cls_edit" cueText="服务器地址"></edit>
+    <text pos="[5,{0">:</text>
+    <edit name="edit_iermu_port" pos="[5,{0" size="60,26" extend="2" class="cls_edit" cueText="端口号" align="center"></edit>
+    <!--******************************图片上传服务器******************************-->
+
+    <imgbtn name="btn_camera_server" skin="btn.blue_little" pos="|0,[40" offset="-0.5,-0.5" align="center" colorText="@color/white">确定</imgbtn>
+    <text pos="{0,[0" size="10, 60"></text>
+
+    <listview pos="|-160,360" size="260,60" name="list_local_ip" colorbkgnd="@color/white" show="0">
+      <template itemHeight="30" colorHover="#f2f2f2" colorSelected="#e6e6e6" trackMouseEvent="1">
+        <text name="item_local_ip" margin-x="2" bkgndColor="@color/red">text item</text>
+      </template>
+    </listview>
+    
+  </scrollview>  
+</include> 

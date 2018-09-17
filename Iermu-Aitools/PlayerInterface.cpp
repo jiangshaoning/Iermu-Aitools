@@ -79,63 +79,63 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	CPlayerInterface *pThisInstance = (CPlayerInterface*)::GetWindowLong(hDlg, GWL_USERDATA);
 	switch (message)
 	{
-	case WM_SYSCOMMAND:
-		if (wParam == SC_CLOSE)
+		case WM_SYSCOMMAND:
+			if (wParam == SC_CLOSE)
+			{
+				// 如果执行了关闭  
+				// 销毁对话框，将收到WM_DESTROY消息  
+				if (pThisInstance)
+				{
+					pThisInstance->ffplayStop();
+				}
+				else
+				{
+					DestroyWindow(hDlg);
+				};
+				//PostQuitMessage(0);
+			}
+			break;
+		case WM_SIZE:
 		{
-			// 如果执行了关闭  
-			// 销毁对话框，将收到WM_DESTROY消息  
+			LONG width = LOWORD(lParam); // width of client area
+			LONG height = HIWORD(lParam); // height of client area
+
 			if (pThisInstance)
 			{
-				pThisInstance->ffplayStop();
-			}
-			else
-			{
-				DestroyWindow(hDlg);
-			};
-			//PostQuitMessage(0);
-		}
-		break;
-	case WM_SIZE:
-	{
-		LONG width = LOWORD(lParam); // width of client area
-		LONG height = HIWORD(lParam); // height of client area
-
-		if (pThisInstance)
-		{
-			player_setrect(pThisInstance->m_hplayer, 0, 0, 0, width, height);
-		}
-	}
-	break;
-
-	case MSG_FFPLAYER:
-		if (pThisInstance)
-		{
-			switch (wParam)
-			{
-			case MSG_PLAY_COMPLETED:
-				//SetEvent(pThisInstance->m_hEvent);
-				//pThisInstance->ffplaySingleStop();
-				//pThisInstance->ffplaySingleWithUrl(pThisInstance->m_url);
-
-				//RELEASEPLAYER(pThisInstance->m_hplayer);
-				//SetEvent(pThisInstance->m_hEvent);					
-				break;
-			case MSG_OPEN_DONE:
-				param = -0;  player_setparam(pThisInstance->m_hplayer, PARAM_AUDIO_VOLUME, &param);
-				player_play(pThisInstance->m_hplayer);
-				break;
-			case MSG_OPEN_FAILED:
-				//RELEASEPLAYER(pThisInstance->m_hplayer);
-				//SetEvent(pThisInstance->m_hEvent);
-				char url[MAX_PATH] = { 0 };
-				strcpy(url, pThisInstance->m_url);
-				pThisInstance->ffplayStop();
-				pThisInstance->ffplayWithUrl(url);
-				break;
-
+				player_setrect(pThisInstance->m_hplayer, 0, 0, 0, width, height);
 			}
 		}
-		break;
-	}
-	return (INT_PTR)FALSE;
+			break;
+
+		case MSG_FFPLAYER:
+			if (pThisInstance)
+			{
+				switch (wParam)
+				{
+					case MSG_PLAY_COMPLETED:
+						//SetEvent(pThisInstance->m_hEvent);
+						//pThisInstance->ffplaySingleStop();
+						//pThisInstance->ffplaySingleWithUrl(pThisInstance->m_url);
+
+						//RELEASEPLAYER(pThisInstance->m_hplayer);
+						//SetEvent(pThisInstance->m_hEvent);					
+						break;
+					case MSG_OPEN_DONE:
+						param = -0;  player_setparam(pThisInstance->m_hplayer, PARAM_AUDIO_VOLUME, &param);
+						player_play(pThisInstance->m_hplayer);
+						break;
+					case MSG_OPEN_FAILED:
+						//RELEASEPLAYER(pThisInstance->m_hplayer);
+						//SetEvent(pThisInstance->m_hEvent);
+						char url[MAX_PATH] = { 0 };
+						strcpy(url, pThisInstance->m_url);
+						pThisInstance->ffplayStop();
+						pThisInstance->ffplayWithUrl(url);
+						break;
+				}
+			}
+			break;
+		}
+	
+		return (INT_PTR)FALSE;
 }

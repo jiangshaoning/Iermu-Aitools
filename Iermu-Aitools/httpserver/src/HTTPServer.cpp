@@ -47,6 +47,7 @@ HTTPServer::~HTTPServer()
 	assert(_sockNewClient == INVALID_SOCKET);
 
 	delete []_acceptContext.buf;
+	IOCPNetwork::cleanWinsockLib();
 }
 
 HTTPServer::connection_context_t* HTTPServer::allocConnectionContext(const std::string &ipAddr, unsigned int port)

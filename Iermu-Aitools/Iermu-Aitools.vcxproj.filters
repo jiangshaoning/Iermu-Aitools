@@ -101,6 +101,12 @@
     <ClCompile Include="httpserver\src\XmlDocument.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SAnimImg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="STabCtrl2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Iermu-Aitools.rc">
@@ -189,6 +195,12 @@
     <ClInclude Include="httpserver\include\XmlDocument.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SAnimImg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="STabCtrl2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\soui_res.rc2">
@@ -211,11 +223,27 @@
     <Xml Include="uires\xml\dlg_main.xml">
       <Filter>SoUI Resouece</Filter>
     </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="uires\image\soui.ico">
+    <Xml Include="uires\xml\dlg_tab.xml">
       <Filter>SoUI Resouece</Filter>
-    </Image>
+    </Xml>
+    <Xml Include="uires\xml\dlg_cameraInfo.xml">
+      <Filter>SoUI Resouece</Filter>
+    </Xml>
+    <Xml Include="uires\xml\general_page.xml">
+      <Filter>SoUI Resouece</Filter>
+    </Xml>
+    <Xml Include="uires\xml\server_page.xml">
+      <Filter>SoUI Resouece</Filter>
+    </Xml>
+    <Xml Include="uires\xml\store_page.xml">
+      <Filter>SoUI Resouece</Filter>
+    </Xml>
+    <Xml Include="uires\xml\other_page.xml">
+      <Filter>SoUI Resouece</Filter>
+    </Xml>
+    <Xml Include="uires\xml\dlg_cameraList.xml">
+      <Filter>SoUI Resouece</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="uires\uires.idx">

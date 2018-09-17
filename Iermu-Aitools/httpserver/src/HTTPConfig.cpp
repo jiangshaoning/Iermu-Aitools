@@ -200,7 +200,7 @@ bool HTTPConfig::dirVisible()
 	return false;
 }
 
-bool HTTPConfig::setDirVisible(bool visible)
+bool HTTPConfig::setDirVisible(BOOL visible)
 {
 	return set("/settings/general/directoryVisible", visible ? "yes" : "no");
 }
@@ -219,7 +219,7 @@ bool HTTPConfig::autoRun()
 	return false;
 }
 
-bool HTTPConfig::setAutoRun(bool yes)
+bool HTTPConfig::setAutoRun(BOOL yes)
 {
 	return set("/settings/general/autoRun", yes ? "yes" : "no");
 }

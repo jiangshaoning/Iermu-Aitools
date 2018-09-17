@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<include width="920" height="540">
+  <imgbtn name="btn_camerainfo_back" skin="btn.back" pos="10, 15"></imgbtn>
+  <imgbtn name="btn_camerainfo_pre" skin="btn.pre" pos="[1, {0" ></imgbtn>
+
+  <text pos="[160,{0" name="canmera_playurl" colorText="@color/white">rtmp://192.168.1.1:1935/live/1234567890</text>
+  <imgbtn name="btn_playLive" skin="btn.play" pos="[20,{0" width="80" >视频直播</imgbtn>
+  <imgbtn name="btn_timeSync" skin="btn.sync" pos="[1,{0" width="80">时间同步</imgbtn>
+  
+  <tabctrl name="tab_main" pos="0,[20,-0,-0" show="1" blackcurSel="0" focusable="0" animateSteps="10" animateType="1" tabSkin="_skin.page_main" tabAlign="left" text-x="10" tabWidth="200" tabHeight="60" colorBkgnd="@color/white" colorText="@color/black" colorTextHover="@color/blue" colorTextPush="@color/blue">
+    <page title="通用">
+      <include src="layout:XML_GENERALPAGE"/>
+    </page>
+    <page title="服务器配置">
+      <include src="layout:XML_SERVERPAGE"/>
+    </page>
+    <page title="本地储存设置">
+      <include src="layout:XML_STOREPAGE"/>
+    </page>
+    <page title="其他">
+      <include src="layout:XML_OTHERPAGE"/>
+    </page>
+  </tabctrl>     
+</include>

@@ -111,9 +111,9 @@ int WinSocketClient::cmsRecv(SOCKET sockfd, char *buff, int len, int mode)
 	return cmsLen;
 }
 
-bool WinSocketClient::SendBuffToHost(const char *ip, char *sendbuff, int sendlen, char *outbuff)
+bool WinSocketClient::SendBuffToHost(const char *ip, char *sendbuff, int sendlen, char *outbuff, bool save)
 {
-	WSADATA wsaData;
+	//WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(2, 0);
 	bool ret = false;
 	int n = 0;
@@ -123,16 +123,16 @@ bool WinSocketClient::SendBuffToHost(const char *ip, char *sendbuff, int sendlen
 	char cmdlogin[44] = { 0 };
 	char databuf[256] = { 0 };
 
-	if (WSAStartup(wVersionRequested, &wsaData) == SOCKET_ERROR)
-	{
-		return ret;
-	}
+	//if (WSAStartup(wVersionRequested, &wsaData) == SOCKET_ERROR)
+	//{
+	//	return ret;
+	//}
 
 	//建立通讯socket
 	SOCKET sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0)
 	{
-		WSACleanup();
+		//WSACleanup();
 		return ret;
 	}
 
@@ -163,7 +163,7 @@ bool WinSocketClient::SendBuffToHost(const char *ip, char *sendbuff, int sendlen
 
 	//接受服务器消息
 	n = cmsRecv(sockfd, cmdbuf, sizeof(cmdbuf), 0);
-	SLOGFMTE("来自摄像机的消息: %d: %d %d %d", cmdbuf[0], cmdbuf[1], cmdbuf[2], cmdbuf[3]);
+	//SLOGFMTE("来自摄像机的消息: %d: %d %d %d\n", cmdbuf[0], cmdbuf[1], cmdbuf[2], cmdbuf[3]);
 	if (n < sizeof(cmdbuf) || (cmdbuf[2] == -1 && cmdbuf[3] > 0))
 		goto end;
 	
@@ -179,7 +179,7 @@ bool WinSocketClient::SendBuffToHost(const char *ip, char *sendbuff, int sendlen
 		goto end;
 
 	n = cmsRecv(sockfd, cmdbuf, sizeof(cmdbuf), 0);
-	SLOGFMTE("来自摄像机的消息: %d: %d %d %d", cmdbuf[0], cmdbuf[1], cmdbuf[2], cmdbuf[3]);
+	SLOGFMTE("来自摄像机的消息: %d: %d %d %d\n", cmdbuf[0], cmdbuf[1], cmdbuf[2], cmdbuf[3]);
 	if (n < sizeof(cmdbuf) || (cmdbuf[2] == -1 && cmdbuf[3] > 0))
 		goto end;
 
@@ -195,7 +195,8 @@ bool WinSocketClient::SendBuffToHost(const char *ip, char *sendbuff, int sendlen
 	if (n < recvlen || (cmdbuf[2] == -1 && cmdbuf[3] > 0))
 		goto end;
 
-	if (sendbuff[0] == 75 && (sendbuff[1] == 43 || sendbuff[1] == 89 || sendbuff[1] == 90 || sendbuff[1] == 91 || sendbuff[1] == 92))
+	//是否存菜单
+	if (save)
 	{
 		char cmdsetIP[4] = { 0 };
 		short int iplen = 0;
@@ -210,17 +211,16 @@ bool WinSocketClient::SendBuffToHost(const char *ip, char *sendbuff, int sendlen
 			goto end;
 
 	}
-
 	ret = true;
 
 end:
 	closesocket(sockfd);
-	WSACleanup();
+	//WSACleanup();
 	return ret;
 
 }
 
-bool WinSocketClient::GetDeviceID(const char *ip, string &id)
+bool WinSocketClient::GetDeviceID(const char *ip, CameraAddr &cad)
 {
 	bool ret;
 	char cmdgetid[4] = { 0 };
@@ -232,20 +232,22 @@ bool WinSocketClient::GetDeviceID(const char *ip, string &id)
 	cmdgetid[1] = 3;
 	memcpy(cmdgetid + 2, &getidLen, 2);
 
-	ret = SendBuffToHost(ip, cmdgetid, sizeof(cmdgetid), databuf);
+	ret = SendBuffToHost(ip, cmdgetid, sizeof(cmdgetid), databuf, false);
 	if (ret)
 	{
 		char devidstr[16] = { 0 };
 		memcpy(mac + 2, databuf + 68, 6);
 		long long devid = Convert(mac);
 		ll2str(devidstr, devid);
-		id = devidstr;
-		SLOGFMTE(" mac: %lld", devid);
+		memcpy(cad.cameraip, ip, strlen(ip));
+		memcpy(cad.cameraid, devidstr, sizeof(devidstr));
+		sprintf(cad.url, "rtmp://%s:1935/live/%s", cad.cameraip, cad.cameraid);
+		SLOGFMTE(" DeviceID: %lld\n", devid);
 	}
 	return ret;
 }
 
-bool WinSocketClient::SetCameraTime(const char *ip, DateTime &dt)
+bool WinSocketClient::SetCameraTime(const char *ip, DateTime &dt, bool save)
 {
 	bool ret;
 	char cmdsettime[12] = { 0 };
@@ -255,19 +257,19 @@ bool WinSocketClient::SetCameraTime(const char *ip, DateTime &dt)
 	//设置时间buff
 	cmdsettime[0] = 65;
 	cmdsettime[1] = 5;
-	dt.date = htonl(dt.date);
-	dt.time = htonl(dt.time);
+	int date = htonl(dt.date);
+	int time = htonl(dt.time);
 	memcpy(cmdsettime + 2, &timelen, 2);
-	memcpy(cmdsettime + 4, &dt.date, 4);
-	memcpy(cmdsettime + 8, &dt.time, 4);
+	memcpy(cmdsettime + 4, &date, 4);
+	memcpy(cmdsettime + 8, &time, 4);
 
-	ret = SendBuffToHost(ip, cmdsettime, sizeof(cmdsettime), databuf);
+	ret = SendBuffToHost(ip, cmdsettime, sizeof(cmdsettime), databuf, save);
 
 	return ret;
 
 }
 
-bool WinSocketClient::SetHostIPAddr(const char *ip, IPPort &ipp)
+bool WinSocketClient::SetHostIPAddr(const char *ip, IPPort &ipp, bool save)
 {
 	bool ret;
 	char cmdsetIP[244] = { 0 };
@@ -277,17 +279,17 @@ bool WinSocketClient::SetHostIPAddr(const char *ip, IPPort &ipp)
 	//设置IP
 	cmdsetIP[0] = 75;
 	cmdsetIP[1] = 91;
-	ipp.port = htons(ipp.port);
-	ipp.cp_port = htons(ipp.cp_port);
+	UINT16 port = htons(ipp.port);
+	UINT16 cp_port = htons(ipp.cp_port);
 	memcpy(cmdsetIP + 2, &iplen, 2);
-	memcpy(cmdsetIP + 4, &ipp.port, 2);
+	memcpy(cmdsetIP + 4, &port, 2);
 	*(cmdsetIP + 6) = ipp.lib_type;
 	memcpy(cmdsetIP + 7, ipp.domain, DOMAIN_LEN);
-	memcpy(cmdsetIP + 68, &ipp.cp_port, 2);
+	memcpy(cmdsetIP + 68, &cp_port, 2);
 	memcpy(cmdsetIP + 70, ipp.cp_domain, CPDOMAIN_LEN);
 	memcpy(cmdsetIP + 134, ipp.sw_id, LIBNAME_LEN);
 
-	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf);
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, save);
 
 	return ret;
 }
@@ -304,7 +306,7 @@ bool WinSocketClient::GetHostIPAddr(const char *ip, IPPort &ipp)
 	cmdsetIP[1] = 91;
 	memcpy(cmdsetIP + 2, &iplen, 2);
 
-	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf);
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
 	ipp.port = ntohs(*((unsigned short *)databuf));
 	ipp.lib_type = databuf[2];
 	memcpy(ipp.domain, databuf + 3, DOMAIN_LEN);
@@ -314,7 +316,7 @@ bool WinSocketClient::GetHostIPAddr(const char *ip, IPPort &ipp)
 	return ret;
 }
 
-bool WinSocketClient::SetFaceParameter(const char *ip, FaceParameter &fpar)
+bool WinSocketClient::SetFaceParameter(const char *ip, FaceParameter &fpar, bool save)
 {
 	bool ret;
 	char cmdsetface[86] = { 0 };
@@ -331,19 +333,19 @@ bool WinSocketClient::SetFaceParameter(const char *ip, FaceParameter &fpar)
 	*(cmdsetface + 69) = fpar.faces;
 	*(cmdsetface + 70) = fpar.face_img;
 	*(cmdsetface + 71) = 0;
-	fpar.box = htons(fpar.box);
-	fpar.width = htons(fpar.width);
-	fpar.height = htons(fpar.height);
-	fpar.reliability = htons(fpar.reliability);
-	fpar.res_time = htons(fpar.res_time);
-	memcpy(cmdsetface + 72, &fpar.box, 2);
-	memcpy(cmdsetface + 74, &fpar.width, 2);
-	memcpy(cmdsetface + 76, &fpar.height, 2);
-	memcpy(cmdsetface + 78, &fpar.reliability, 2);
-	memcpy(cmdsetface + 80, &fpar.res_time, 2);
+	UINT16 box = htons(fpar.box);
+	UINT16 width = htons(fpar.width);
+	UINT16 height = htons(fpar.height);
+	UINT16 reliability = htons(fpar.reliability);
+	UINT16 res_time = htons(fpar.res_time);
+	memcpy(cmdsetface + 72, &box, 2);
+	memcpy(cmdsetface + 74, &width, 2);
+	memcpy(cmdsetface + 76, &height, 2);
+	memcpy(cmdsetface + 78, &reliability, 2);
+	memcpy(cmdsetface + 80, &res_time, 2);
 	memcpy(cmdsetface + 82, &fpar.groupID, 4);
 
-	ret = SendBuffToHost(ip, cmdsetface, sizeof(cmdsetface), databuf);
+	ret = SendBuffToHost(ip, cmdsetface, sizeof(cmdsetface), databuf, save);
 
 	return ret;
 }
@@ -361,7 +363,7 @@ bool WinSocketClient::GetFaceParameter(const char *ip, FaceParameter &fpar)
 	cmdsetIP[1] = 90;
 	memcpy(cmdsetIP + 2, &iplen, 2);
 
-	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf);
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
 
 	if (ret)
 	{
@@ -381,7 +383,7 @@ bool WinSocketClient::GetFaceParameter(const char *ip, FaceParameter &fpar)
 }
 
 
-bool WinSocketClient::SetAIFunction(const char *ip, AIFunction &aifunc)
+bool WinSocketClient::SetAIFunction(const char *ip, AIFunction &aifunc, bool save)
 {
 	bool ret;
 	char cmdsetAi[12] = { 0 };
@@ -391,14 +393,15 @@ bool WinSocketClient::SetAIFunction(const char *ip, AIFunction &aifunc)
 	//设置IP
 	cmdsetAi[0] = 75;
 	cmdsetAi[1] = 92;
+	char head[4] = { 0x72, 0x2a, 0x3c, 0x6e };
 	memcpy(cmdsetAi + 2, &iplen, 2);
-	memcpy(cmdsetAi + 4, &aifunc.head, 4);
+	memcpy(cmdsetAi + 4, head, 4);
 	cmdsetAi[8] = aifunc.lan;
 	cmdsetAi[9] = aifunc.comparison;
-	aifunc.jpgmem = htons(aifunc.jpgmem);
-	memcpy(cmdsetAi + 10, &aifunc.jpgmem, 2);
+	UINT16 jpgmem = htons(aifunc.jpgmem);
+	memcpy(cmdsetAi + 10, &jpgmem, 2);
 
-	ret = SendBuffToHost(ip, cmdsetAi, sizeof(cmdsetAi), databuf);
+	ret = SendBuffToHost(ip, cmdsetAi, sizeof(cmdsetAi), databuf, save);
 
 	return ret;
 }
@@ -416,7 +419,7 @@ bool WinSocketClient::GetAIFunction(const char *ip, AIFunction &aifunc)
 	cmdsetIP[1] = 92;
 	memcpy(cmdsetIP + 2, &iplen, 2);
 
-	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf);
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
 
 	if (ret)
 	{
@@ -428,7 +431,7 @@ bool WinSocketClient::GetAIFunction(const char *ip, AIFunction &aifunc)
 }
 
 
-bool WinSocketClient::SetFaceFuncSetting(const char *ip, FaceFuncSetting &ffset)
+bool WinSocketClient::SetFaceFuncSetting(const char *ip, FaceFuncSetting &ffset, bool save)
 {
 	bool ret;
 	char cmdsetFFS[20] = { 0 };
@@ -446,7 +449,7 @@ bool WinSocketClient::SetFaceFuncSetting(const char *ip, FaceFuncSetting &ffset)
 	cmdsetFFS[7] = 0;
 	memset(cmdsetFFS+8, 0xff, 12);
 
-	ret = SendBuffToHost(ip, cmdsetFFS, sizeof(cmdsetFFS), databuf);
+	ret = SendBuffToHost(ip, cmdsetFFS, sizeof(cmdsetFFS), databuf, save);
 
 	return ret;
 }
@@ -464,7 +467,7 @@ bool WinSocketClient::GetFaceFuncSetting(const char *ip, FaceFuncSetting &ffset)
 	cmdsetIP[1] = 89;
 	memcpy(cmdsetIP + 2, &iplen, 2);
 
-	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf);
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
 
 	if (ret)
 	{
@@ -475,7 +478,7 @@ bool WinSocketClient::GetFaceFuncSetting(const char *ip, FaceFuncSetting &ffset)
 	return ret;
 }
 
-bool WinSocketClient::SetVmd(const char *ip, UINT8 &aifunc)
+bool WinSocketClient::SetRec(const char *ip, RECParameter &rec, bool save)
 {
 	bool ret;
 	char cmdsetVmd[12] = { 0 };
@@ -488,15 +491,14 @@ bool WinSocketClient::SetVmd(const char *ip, UINT8 &aifunc)
 	memcpy(cmdsetVmd + 2, &iplen, 2);
 
 	memset(cmdsetVmd + 4, 0xff, 8);
-	cmdsetVmd[9] = aifunc;
+	cmdsetVmd[9] = rec.rec;
 
-
-	ret = SendBuffToHost(ip, cmdsetVmd, sizeof(cmdsetVmd), databuf);
+	ret = SendBuffToHost(ip, cmdsetVmd, sizeof(cmdsetVmd), databuf, save);
 
 	return ret;
 }
 
-bool WinSocketClient::GetVmd(const char *ip, UINT8 &aifunc)
+bool WinSocketClient::GetRec(const char *ip, RECParameter &rec)
 {
 	bool ret;
 
@@ -509,14 +511,128 @@ bool WinSocketClient::GetVmd(const char *ip, UINT8 &aifunc)
 	cmdsetIP[1] = 43;
 	memcpy(cmdsetIP + 2, &iplen, 2);
 
-	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf);
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
 
 	if (ret)
 	{
-		aifunc = databuf[5];
+		rec.rec = databuf[5];
 	}
 	return ret;
 }
+
+
+bool WinSocketClient::SetNAS(const char *ip, NASParameter &nas, bool save)
+{
+	bool ret;
+	char cmdsetNas[146] = { 0 };
+	short int iplen = 142;
+	char databuf[256] = { 0 };
+
+	//设置IP
+	cmdsetNas[0] = 75;
+	cmdsetNas[1] = 62;
+
+	memcpy(cmdsetNas + 2, &iplen, 2);
+
+	int space = htonl(nas.space);
+	cmdsetNas[4] = nas.status;
+	memcpy(cmdsetNas + 5, nas.user, NASUSER_LEN);
+	memcpy(cmdsetNas + 38, nas.passwd, NASPASSWD_LEN);
+	memcpy(cmdsetNas + 71, nas.path, NASPATH_LEN);
+	memcpy(cmdsetNas+ 122, nas.name, NASNAME_LEN);
+	memcpy(cmdsetNas + 138, nas.ip, sizeof(nas.ip));
+	memcpy(cmdsetNas + 142, &space, 4);
+
+	ret = SendBuffToHost(ip, cmdsetNas, sizeof(cmdsetNas), databuf, save);
+
+	return ret;
+}
+
+
+bool WinSocketClient::GetNAS(const char *ip, NASParameter &nas)
+{
+	bool ret;;
+	char cmdsetIP[4] = { 0 };
+	short int iplen = 0;
+	char databuf[256] = { 0 };
+
+	//设置IP
+	cmdsetIP[0] = 74;
+	cmdsetIP[1] = 62;
+	memcpy(cmdsetIP + 2, &iplen, 2);
+
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
+
+	if (ret)
+	{
+		nas.status = databuf[0];
+		memcpy(nas.user, databuf + 1, NASUSER_LEN);
+		memcpy(nas.passwd, databuf + 34, NASPASSWD_LEN);
+		memcpy(nas.path, databuf + 67, NASPATH_LEN);
+		memcpy(nas.name, databuf + 118, NASNAME_LEN);
+		memcpy(nas.ip, databuf + 134, sizeof(nas.ip));
+		nas.space = ntohl(*((unsigned int *)(databuf + 138)));
+	}
+	return ret;
+}
+
+bool WinSocketClient::RestartDevice(const char *ip)
+{
+	bool ret;
+
+	char cmdsetIP[4] = { 0 };
+	short int iplen = 0;
+	char databuf[256] = { 0 };
+
+	//设置IP
+	cmdsetIP[0] = 65;
+	cmdsetIP[1] = 1;
+	memcpy(cmdsetIP + 2, &iplen, 2);
+
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
+	
+	return ret;
+}
+
+bool WinSocketClient::SetFormateSDCard(const char *ip)
+{
+	bool ret;
+
+	char cmdsetIP[4] = { 0 };
+	short int iplen = 0;
+	char databuf[256] = { 0 };
+
+	//设置IP
+	cmdsetIP[0] = 75;
+	cmdsetIP[1] = 83;
+	memcpy(cmdsetIP + 2, &iplen, 2);
+
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
+
+	return ret;
+}
+
+bool WinSocketClient::GetFormateSDCard(const char *ip, int &progress)
+{
+	bool ret;
+
+	char cmdsetIP[4] = { 0 };
+	short int iplen = 0;
+	char databuf[256] = { 0 };
+
+	//设置IP
+	cmdsetIP[0] = 74;
+	cmdsetIP[1] = 83;
+	memcpy(cmdsetIP + 2, &iplen, 2);
+
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
+	if (ret)
+		progress = ntohl(*((unsigned int *)databuf));
+	else
+		progress = 1000;
+	return ret;
+}
+
 
 //bool WinSocketClient::GetPanorama(const char *ip, string &panoTemplate)
 //{

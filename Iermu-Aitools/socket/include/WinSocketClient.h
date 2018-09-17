@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <ws2tcpip.h> 
+#include "UpnpTool.h"
 
 #pragma comment(lib, "ws2_32.lib") 
 using namespace std;
@@ -13,6 +14,11 @@ using namespace std;
 #define DOMAIN_LEN						(61)
 #define CPDOMAIN_LEN					(64)
 #define LIBNAME_LEN						(110)
+
+#define NASUSER_LEN						(33)
+#define NASPASSWD_LEN					(33)
+#define NASPATH_LEN						(51)
+#define NASNAME_LEN						(16)
 enum
 {
 	SENDER_MAINDLG_ID = 30000,
@@ -20,15 +26,14 @@ enum
 
 typedef enum
 {
-	OPT_UPLOADIP,
-	OPT_GETCAMERA_INFO,
-	OPT_SETAIFUNC_FROMCAMERAIP,
-	OPT_SETFACE_FROMCAMERAIP,
-	OPT_SETTIME_FROMLOCALIP,
-	OPT_PLAY_FROMLOCALIP,
-	OPT_SETTIME_FROMCAMERAIP,
-	OPT_PLAY_FROMCAMERAIP
-
+	OPT_GETCAMERA_INFO,				//从摄像机IP获取信息
+	OPT_GETCAMERA_LIST,				//从本机IP获取列表信息
+	OPT_SETCAMERA_GENERAL,			//设置通用
+	OPT_SETCAMERA_SERVER,			//设置服务配置
+	OPT_SETCAMERA_STORE,			//设置储存配置
+	OPT_SETCAMERA_OTHER,			//设置其他
+	OPT_SETTIME_SYNC,				//时间同步
+	OPT_FORMAT_SDCARD				//格式化SD卡
 }SOCKETOPTION;
 
 
@@ -74,12 +79,6 @@ typedef struct
 	UINT8 face_rec;
 	UINT8 face_cod;
 	UINT8 face_cou;
-	//UINT16 count1_x;
-	//UINT16 count1_y;
-	//UINT16 count2_x;
-	//UINT16 count2_y;
-	//UINT16 count3_x;
-	//UINT16 count3_y;
 }FaceFuncSetting;
 
 
@@ -101,20 +100,39 @@ typedef struct
 
 typedef struct
 {
-	UINT8 head[4];
+	UINT8 head[4]; //固定 0x72,0x2a,0x3c,0x6e 写死了
 	UINT8 lan;
 	UINT8 comparison;
 	UINT16 jpgmem;
 }AIFunction;
 
+//NAS参数 62
+typedef struct
+{
+	UINT8 status; //nas 使能（两次开关才能打开NAS）
+	UINT8 user[NASUSER_LEN];
+	UINT8 passwd[NASPASSWD_LEN];
+	UINT8 path[NASPATH_LEN];
+	UINT8 name[NASNAME_LEN];
+	UINT8 ip[4];
+	UINT32 space;
+}NASParameter;
+
+//录像参数 43
+typedef struct
+{
+	UINT8 rec; //最低位为1表示禁止了卡录和NAS录像  最高位为1表示事件录像 0表示持续录像
+}RECParameter;
 
 typedef struct
 {
+	CameraAddr cad;
 	IPPort	ipp;
 	FaceParameter fp;
 	FaceFuncSetting ffs;
 	AIFunction af;
-	UINT8 rec;
+	NASParameter np;
+	RECParameter rec;
 }AICameraInfo;
 
 //在MainDlg中使用SNotifyCenter的通知的异步事件 
@@ -127,7 +145,8 @@ public:
 
 	SOCKETOPTION opt;
 	bool  retOK;
-	string nData;
+	SStringT nData;
+	int progress; //进度值
 };
 
 class WinSocketClient
@@ -138,19 +157,36 @@ private:
 	int ull2str(char *s, unsigned long long v);
 	int cmsSend(SOCKET sockfd, char *buff, int len, int mode);
 	int cmsRecv(SOCKET sockfd, char *buff, int len, int mode);
-	bool SendBuffToHost(const char *ip, char *sendbuff, int sendlen, char *outbuff);
+	bool SendBuffToHost(const char *ip, char *sendbuff, int sendlen, char *outbuff, bool save);
 public:
-	bool GetDeviceID(const char *ip, string &id);
-	bool SetCameraTime(const char *ip, DateTime &dt);
+	//save: true保存菜单   （走65 3协议）
+
+	bool GetDeviceID(const char *ip, CameraAddr &cad);
+	bool SetCameraTime(const char *ip, DateTime &dt, bool save);
 	bool GetHostIPAddr(const char *ip, IPPort &ipp);
-	bool SetHostIPAddr(const char *ip, IPPort &ipp);
-	bool SetFaceParameter(const char *ip, FaceParameter &fpar);
+	bool SetHostIPAddr(const char *ip, IPPort &ipp, bool save);
 	bool GetFaceParameter(const char *ip, FaceParameter &fpar);
-	bool SetAIFunction(const char *ip, AIFunction &aifunc);
+	bool SetFaceParameter(const char *ip, FaceParameter &fpar, bool save);
 	bool GetAIFunction(const char *ip, AIFunction &aifunc);
-	bool SetVmd(const char *ip, UINT8 &aifunc);
-	bool GetVmd(const char *ip, UINT8 &aifunc);
-	bool SetFaceFuncSetting(const char *ip, FaceFuncSetting &ffset);
+	bool SetAIFunction(const char *ip, AIFunction &aifunc, bool save);
+
+	//设置、获取录像类型
+	bool GetRec(const char *ip, RECParameter &rec);
+	bool SetRec(const char *ip, RECParameter &rec, bool save);
+
 	bool GetFaceFuncSetting(const char *ip, FaceFuncSetting &ffset);
+	bool SetFaceFuncSetting(const char *ip, FaceFuncSetting &ffset, bool save);
+
+	//设置、获取NAS参数
+	bool GetNAS(const char *ip, NASParameter &nas);
+	bool SetNAS(const char *ip, NASParameter &nas, bool save);
+
+	//重启设备
+	bool RestartDevice(const char *ip);
+
+	//格式化SD卡
+	bool SetFormateSDCard(const char *ip);
+	bool GetFormateSDCard(const char *ip, int &progress);
+
 	//bool GetPanorama(const char *ip, string &panoTemplate);
 };

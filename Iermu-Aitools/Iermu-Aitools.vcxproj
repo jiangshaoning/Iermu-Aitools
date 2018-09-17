@@ -202,9 +202,11 @@
     <ClCompile Include="Iermu-Aitools.cpp" />
     <ClCompile Include="MainDlg.cpp" />
     <ClCompile Include="PlayerInterface.cpp" />
+    <ClCompile Include="SAnimImg.cpp" />
     <ClCompile Include="socket\src\threadObject.cpp" />
     <ClCompile Include="socket\src\UpnpTool.cpp" />
     <ClCompile Include="socket\src\WinSocketClient.cpp" />
+    <ClCompile Include="STabCtrl2.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -239,9 +241,11 @@
     <ClInclude Include="MainDlg.h" />
     <ClInclude Include="PlayerInterface.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SAnimImg.h" />
     <ClInclude Include="socket\include\threadObject.h" />
     <ClInclude Include="socket\include\UpnpTool.h" />
     <ClInclude Include="socket\include\WinSocketClient.h" />
+    <ClInclude Include="STabCtrl2.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -259,19 +263,38 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SOUIPATH)\tools\uiresbuilder.exe" -i "%(FullPath)" -p uires -r .\res\soui_res.rc2 -h .\res\resource.h idtable</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building SoUI Resource</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\res\soui_res.rc2;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="uires\uidef\init.xml" />
     <Xml Include="uires\values\color.xml" />
-    <Xml Include="uires\values\skin.xml" />
+    <Xml Include="uires\values\skin.xml">
+      <SubType>Designer</SubType>
+    </Xml>
     <Xml Include="uires\values\string.xml" />
+    <Xml Include="uires\xml\dlg_cameraInfo.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="uires\xml\dlg_cameraList.xml">
+      <SubType>Designer</SubType>
+    </Xml>
     <Xml Include="uires\xml\dlg_main.xml">
       <SubType>Designer</SubType>
     </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="uires\image\soui.ico" />
+    <Xml Include="uires\xml\dlg_tab.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="uires\xml\general_page.xml" />
+    <Xml Include="uires\xml\other_page.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="uires\xml\server_page.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="uires\xml\store_page.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

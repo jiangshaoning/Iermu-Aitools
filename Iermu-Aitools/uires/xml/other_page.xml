@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<include>
+  <window pos="0,0,-0,-0" layout="center" skin="_skin.white_bg">
+
+    <hr pos="0,0,@2,-0" lineStyle="solid" mode="vertical" colorLine="@color/brown" size="1"/>
+
+    <text pos="20, 20">其他设置</text>
+    <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
+    <text pos="|-200,[5" size="120,30" align="right">仅局域网</text>
+    <combobox name="cbx_lan"  pos="[20,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+      <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+      </liststyle>
+      <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
+      <items>
+        <item text=" 不启用" />
+        <item text=" 启用" />
+      </items>
+    </combobox>
+    <text pos="|-200,[5" size="120,30" align="right">无网路</text>
+    <combobox name="cbx_network"  pos="[20,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+      <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+      </liststyle>
+      <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
+      <items>
+        <item text=" 不启用" />
+        <item text=" 启用" />
+      </items>
+    </combobox>    
+    
+    <imgbtn name="btn_camera_other" skin="btn.blue_little" pos="|0,[320" offset="-0.5,-0.5" align="center" colorText="@color/white">确定</imgbtn>
+
+  </window>
+</include>

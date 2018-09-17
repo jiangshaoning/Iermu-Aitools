@@ -1,22 +1,60 @@
-﻿<resource>
-  <UIDEF>
-    <file name="XML_INIT" path="uidef\init.xml"/>
-  </UIDEF>
-  <LAYOUT>
-    <file name="XML_MAINWND" path="xml\dlg_main.xml"/>
-  </LAYOUT>
+<?xml version="1.0"?>
+<resource>
+	<UIDEF>
+		<file name="XML_INIT" path="uidef\init.xml" />
+	</UIDEF>
+	<LAYOUT>
+		<file name="XML_MAINWND" path="xml\dlg_main.xml" />
+		<file name="XML_TABWND" path="xml\dlg_tab.xml" />
+    <file name="XML_GENERALPAGE" path="xml\general_page.xml" />
+    <file name="XML_SERVERPAGE" path="xml\server_page.xml" />
+    <file name="XML_STOREPAGE" path="xml\store_page.xml" />
+    <file name="XML_OTHERPAGE" path="xml\other_page.xml" />
+		<file name="XML_CAMERALISTWND" path="xml\dlg_cameraList.xml" />
+		<file name="XML_CAMERAINFOWND" path="xml\dlg_cameraInfo.xml" />
+	</LAYOUT>
+	<values>
+		<file name="string" path="values\string.xml" />
+		<file name="color" path="values\color.xml" />
+		<file name="skin" path="values\skin.xml" />
+	</values>
+	<PNG>
+    <file name="ID_SYSBTN_CLOSE" path="image\sysbtn_close.png"/>
+    <file name="ID_SYSBTN_MAX" path="image\sysbtn_max.png"/>
+    <file name="ID_SYSBTN_MIN" path="image\sysbtn_min.png"/>
+    <file name="ID_SYSBTN_RESTORE" path="image\sysbtn_restore.png"/>
+    <file name="ID_SYSBTN_DROP_LARGE" path="image\sysbtn_drop_large.png"/>
+    <file name="ID_SYSBTN_DROP_LITTLE" path="image\sysbtn_drop_little.png"/>
+    <file name="ID_SYSBTN_RADIO" path="image\sysbtn_radio.png"/>
+    <file name="ID_SYSBTN_CHECK" path="image\sysbtn_check.png"/>
+		<file name="ID_TAB_MAIN" path="image\skin_tab_main.png" />
+		<file name="ID_TAB_ICON" path="image\skin_tab_icon.png" />
+    <file name="ID_PAGE_MAIN" path="image\skin_page_main.png" />
+    <file name="ID_BORDER" path="image\skin_border.png" />
+		<file name="ID_TAB_LEFT" path="image\tab_left.png" />
+		<file name="ID_PNG_SHADOW" path="image\shadow.png" />
+		<file name="ID_PNG_BG" path="image\bg.png" />
+		<file name="ID_WHITE_BG" path="image\white_bg.png" />
+		<file name="ID_SERVER_HOVER" path="image\server_hover.png" />
+		<file name="ID_SERVER_LEAVE" path="image\server_leave.png" />
+		<file name="ID_CAMERA_HOVER" path="image\camera_hover.png" />
+		<file name="ID_CAMERA_LEAVE" path="image\camera_leave.png" />
+    <file name="ID_LCEX_HEADER" path="image\lcex_header.png"/>
+    <file name="ID_LCEX_HEADER_ARROW" path="image\lcex_header_arrow.png"/>
+	</PNG>
+  <BTN>
+    <file name="ID_BLUE_LITTLE_BTN" path="image\btn_blue_little.png"/>
+    <file name="ID_BLUE_LARGE_BTN" path="image\btn_blue_large.png"/>
+    <file name="ID_WHITE_BTN" path="image\btn_white.png"/>
+    <file name="ID_BACK_BTN" path="image\btn_back.png"/>
+    <file name="ID_PRE_BTN" path="image\btn_pre.png"/>
+    <file name="ID_REF_BTN" path="image\btn_ref.png"/>
+    <file name="ID_PLAY_BTN" path="image\btn_play.png"/>
+    <file name="ID_SYNC_BTN" path="image\btn_sync.png"/>
+    <file name="ID_FORMAT_BTN" path="image\btn_format.png"/>
+  </BTN>
   
-  <values>
-  	<file name="string" path="values\string.xml"/>
-  	<file name="color" path="values\color.xml"/>
-  	<file name="skin" path="values\skin.xml"/>
-  </values>
-
-  <IMG>
-    <file name ="ID_TAB_MAIN"  path="image\tab_main.png" />
-    <file name="png_tab_left"  path="image\tab_left.png" />
-   </IMG>
-  <ICON>
-    <file name="ICON_LOGO"  path="image\Iermu-Aitools.ico"/>
-  </ICON>
-    </resource>
+	<ICON>
+		<file name="ICON_LOGO" path="image\Iermu-Aitools.ico" />
+	</ICON>
+</resource>

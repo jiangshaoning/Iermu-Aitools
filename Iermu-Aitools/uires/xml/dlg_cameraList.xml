@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<include width="920" height="540">
+  <imgbtn name="btn_camerainfo_back" skin="btn.back" pos="10, 15"></imgbtn>
+  <imgbtn name="btn_camerainfo_pre" skin="btn.pre" pos="[1, {0" ></imgbtn>
+  <imgbtn name="btn_camerainfo_ref" skin="btn.ref" pos="[10, {0" ></imgbtn>
+  <window pos="0, [20, -0, -0" colorBkgnd="@color/white" >
+    <window name="refresh_progress" pos="0, [0, -0, -0" show="0" display ="0" animate="1">
+      <text pos="|-0, |-0" offset="-0.5, -0.5" font="adding:3" colorText="@color/black" align="center">正在刷新列表中...</text>
+    </window>
+   
+    <mclistview name="cameralist_win" pos="0,[0,-0,-0" headerHeight="50" show="1">
+      <header align="center" matchParent="1" sortSkin="_skin_lcex_header_arrow" itemSkin="_skin_lcex_header" itemSwapEnable="1" fixWidth="0" wantTab="1" sortHeader="1" colorBkgnd="#ffffff" >
+        <items>
+          <item width="200">设备ID</item>
+          <item width="200">设备IP</item>
+          <item width="515">播放地址</item>
+        </items>
+      </header>
+      <template itemHeight="50" colorHover="#f2f2f2" colorSelected="#e6e6e6">
+        <window name="col1" clipClient="1">
+          <text name="device_id" pos="|0,|0" offset="-0.5, -0.5" >1234567890</text>
+          <!--hr pos="0,-1,-0,0" colorLine="#666666" /-->
+        </window>
+        <window name="col2" clipClient="1">
+          <text name="device_ip" pos="|0,|0" offset="-0.5, -0.5" >192.168.1.1</text>
+          <!--hr pos="0,-1,-0,0" colorLine="#666666" /-->
+        </window>
+        <window name="col3" clipClient="1">
+          <text name="play_url"  pos="|0,|0" offset="-0.5, -0.5" >rtmp://192.168.1.1:1935/live/1234567890</text>
+          <!--hr pos="0,-1,-0,0" colorLine="#666666" /-->
+        </window>
+      </template>
+    </mclistview>
+    
+  </window>
+</include>

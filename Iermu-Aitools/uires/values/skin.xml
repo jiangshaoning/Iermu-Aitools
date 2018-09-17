@@ -1,6 +1,37 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <skin>
-    <imglist name="skin_tab_main" src="png:ID_TAB_MAIN" states="3"/>
-    <imgframe name="skin_tab_left" src="imgx:png_tab_left" states="3" margin="1,1,1,1"/>
-	</skin>
+  <imglist name="_skin.sysbtn_close"	src="PNG:ID_SYSBTN_CLOSE" states="3"/>
+  <imglist name="_skin.sysbtn_max"	src="PNG:ID_SYSBTN_MAX" states="3"/>
+  <imglist name="_skin.sysbtn_min"	src="PNG:ID_SYSBTN_MIN" states="3"/>
+  <imglist name="_skin.sysbtn_restore" src="PNG:ID_SYSBTN_RESTORE" states="3"/>
+  <imglist name="_skin.sysbtn_drop_large" src="PNG:ID_SYSBTN_DROP_LARGE" states="3" margin-x="5"/>
+  <imglist name="_skin.sysbtn_drop_little" src="PNG:ID_SYSBTN_DROP_LITTLE" states="3"/>
+  <imglist name="_skin.sysbtn_radio" src="PNG:ID_SYSBTN_RADIO" states="3"/>
+  <imglist name="_skin.sysbtn_check" src="PNG:ID_SYSBTN_CHECK" states="3"/>
+  <imgframe name="_skin.border" src="PNG:ID_BORDER" states="2" margin-x="2" margin-y="1"/>
+	<imglist name="_skin.tab_main" src="PNG:ID_TAB_MAIN" states="3" />
+	<imglist name="_skin.tab_icon" src="PNG:ID_TAB_ICON" states="2" />
+  <imglist name="_skin.page_main" src="PNG:ID_PAGE_MAIN" states="3"/>
+	<imglist name="_skin.white_bg" src="PNG:ID_WHITE_BG" alpha="255" />
+  <imgframe name="_skin.tab_left" src="PNG:ID_TAB_LEFT" states="3" margin="1,1,1,1" />
+	<imgframe name="_skin.shadow" src="PNG:ID_PNG_SHADOW" left="5" top="3" right="5" bottom="7" />
+	<imgframe name="_skin.bg" src="PNG:ID_PNG_BG" />
+  <imgframe name="_skin_lcex_header" src="PNG:ID_LCEX_HEADER" states="4" margin-x="2" margin-y="2"/>
+  <imgframe name="_skin_lcex_header_arrow" src="PNG:ID_LCEX_HEADER_ARROW" states="2"  />
+  
+  <imglist name="_skin.sys.dropbtn" src="PNG:SYS_DROPBTN" states="3"/>
+	<imglist name="skin.server.hover" src="PNG:ID_SERVER_HOVER" states="10" />
+	<imglist name="skin.server.leave" src="PNG:ID_SERVER_LEAVE" states="10" />
+	<imglist name="skin.camera.hover" src="PNG:ID_CAMERA_HOVER" states="10" />
+	<imglist name="skin.camera.leave" src="PNG:ID_CAMERA_LEAVE" states="10" />
+
+  <imglist name="btn.blue_little"	src="BTN:ID_BLUE_LITTLE_BTN" states="3"/>
+  <imglist name="btn.blue_large"	src="BTN:ID_BLUE_LARGE_BTN" states="3"/>
+  <imglist name="btn.white"	src="BTN:ID_WHITE_BTN" states="4"/>
+  <imglist name="btn.back"	src="BTN:ID_BACK_BTN" states="4"/>
+  <imglist name="btn.pre"	src="BTN:ID_PRE_BTN" states="4"/>
+  <imglist name="btn.ref"	src="BTN:ID_REF_BTN" states="4"/>
+  <imglist name="btn.play"	src="BTN:ID_PLAY_BTN" states="3"/>
+  <imglist name="btn.sync"	src="BTN:ID_SYNC_BTN" states="3"/>
+  <imglist name="btn.format"	src="BTN:ID_FORMAT_BTN" states="3"/>
+</skin>

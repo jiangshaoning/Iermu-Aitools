@@ -10,6 +10,7 @@ using namespace std;
 
 typedef struct
 {
+	char cameraid[20];
 	char cameraip[20];
 	char url[60];
 }CameraAddr;
@@ -21,5 +22,5 @@ public:
 private:
 	void GetHostAddress(string &strIPAddr);
 	int ReceiveData(int socket, char * data, int length, int timeout, struct sockaddr* addr, socklen_t* len);
-	bool UpnpParse(char *bufr, int n, char *ip, char* buf);
+	bool UpnpParse(char *bufr, int n, char *id, char *ip, char* buf);
 };

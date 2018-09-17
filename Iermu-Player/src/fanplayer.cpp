@@ -373,6 +373,10 @@ static int player_prepare(PLAYER *player)
 	av_dict_set(&codec_opts, "tune", "zerolatency", 0);
 	av_dict_set(&codec_opts, "analyzeduration", "0", 0);
 	av_dict_set(&codec_opts, "max_analyze_duration", "0", 0);
+	av_dict_set(&format_opts, "rtsp_transport", "udp", 0);
+	av_dict_set(&format_opts, "buffer_size", "1", 0);
+	av_dict_set(&format_opts, "fpsprobesize", "2", 0);
+
 
     // open input file
 	if (avformat_open_input(&player->avformat_context, url, fmt, &format_opts) != 0) {

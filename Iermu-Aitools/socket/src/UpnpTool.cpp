@@ -38,9 +38,8 @@ int UpnpTool::ReceiveData(int socket, char * data, int length, int timeout, stru
 	return n;
 }
 
-bool UpnpTool::UpnpParse(char *bufr, int n, char *ip, char* buf)
+bool UpnpTool::UpnpParse(char *bufr, int n, char *id, char *ip, char* buf)
 {
-	char id[16] = { '\0' };
 	char *ptmp, *ptmp2;
 	bufr[n] = '\0';
 
@@ -68,7 +67,7 @@ bool UpnpTool::UpnpParse(char *bufr, int n, char *ip, char* buf)
 //·¢¹ã²¥°ü
 bool UpnpTool::upnpDiscover(int delay, string &localip, SArray<CameraAddr> &iplist)
 {
-	WSADATA wsaData;
+	//WSADATA wsaData;
 	bool ret = false;
 	int opt = 1;
 	int trynum = 1;
@@ -81,14 +80,14 @@ bool UpnpTool::upnpDiscover(int delay, string &localip, SArray<CameraAddr> &ipli
 
 	struct sockaddr_in sockudp_r, sockudp_w;
 
-	if (WSAStartup(MAKEWORD(2, 0), &wsaData) == SOCKET_ERROR){
-		return ret;
-	}
+	//if (WSAStartup(MAKEWORD(2, 0), &wsaData) == SOCKET_ERROR){
+	//	return ret;
+	//}
 
 	sudp = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sudp < 0)
 	{
-		WSACleanup();
+		//WSACleanup();
 		return ret;
 	}
 	memset(&sockudp_r, 0, sizeof(struct sockaddr_in));
@@ -145,7 +144,7 @@ bool UpnpTool::upnpDiscover(int delay, string &localip, SArray<CameraAddr> &ipli
 				memset(&list, 0, sizeof(CameraAddr));
 				bufr[n] = 0;
 				SLOGFMTE("%s", bufr);
-				if (UpnpParse(bufr, n, list.cameraip, list.url))
+				if (UpnpParse(bufr, n, list.cameraid, list.cameraip, list.url))
 				{
 					iplist.Add(list);
 					ret = true;
@@ -158,6 +157,6 @@ bool UpnpTool::upnpDiscover(int delay, string &localip, SArray<CameraAddr> &ipli
 	}
 failed:
 	closesocket(sudp);
-	WSACleanup();
+	//WSACleanup();
 	return ret;
 }

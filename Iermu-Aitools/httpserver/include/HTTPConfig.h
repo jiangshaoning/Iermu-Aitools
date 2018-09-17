@@ -34,7 +34,7 @@ public:
 	bool setDefaultFileNames(const std::string &str);
 	bool setIp(const std::string &str);
 	bool setPort(u_short p);
-	bool setDirVisible(bool visible);
+	bool setDirVisible(BOOL visible);
 	bool setMaxConnections(size_t n);
 	bool setMaxConnectionsPerIp(size_t n);
 	bool setMaxConnectionSpeed(size_t n);
@@ -46,7 +46,7 @@ public:
 	bool removeFcgiServer(const std::string &name);
 	bool updateFcgiServer(const std::string &name, const fcgi_server_t *serverInf);
 
-	bool setAutoRun(bool yes);
+	bool setAutoRun(BOOL yes);
 	bool autoRun();
 
 	bool screenLog();
