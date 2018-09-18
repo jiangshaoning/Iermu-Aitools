@@ -2,7 +2,7 @@
 #define __FANPLAYER_FFRENDER_H__
 
 // 包含头文件
-#include "fanplayer.h"
+#include "ffplayer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,24 +10,6 @@ extern "C" {
 
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
-
-// 类型定义
-typedef struct
-{
-    int16_t *data;
-    int32_t  size;
-} AUDIOBUF;
-
-typedef struct
-{
-    int            samprate;
-    AVSampleFormat sampfmt;
-    int64_t        chlayout;
-    AVRational     frate;
-    AVPixelFormat  pixfmt;
-    int            width;
-    int            height;
-} RENDER_UPDATE_PARAMS;
 
 // 函数声明
 void*render_open(int adevtype, int srate, AVSampleFormat sndfmt, int64_t ch_layout,

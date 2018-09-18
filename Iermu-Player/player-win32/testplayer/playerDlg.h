@@ -2,7 +2,7 @@
 //
 #pragma once
 
-#include "fanplayer.h"
+#include "ffplayer.h"
 
 // CplayerDlg dialog
 class CplayerDlg : public CDialog
@@ -30,16 +30,18 @@ protected:
     DECLARE_MESSAGE_MAP()
 
 private:
-    PLAYER_INIT_PARAMS m_Params;
-    char               m_strUrl[MAX_PATH];
-    void              *m_ffPlayer;
+    char  m_strUrl[MAX_PATH];
+    TCHAR m_strTxt[MAX_PATH];
+    void *m_ffPlayer;
 
 private:
     LONGLONG m_llLastPos;
     BOOL     m_bResetPlayer;
     BOOL     m_bLiveStream;
-    void PlayerReset();
+    BOOL     m_bIsRecording;
+    void PlayerReset(PLAYER_INIT_PARAMS *params);
     void PlayerOpenFile(TCHAR *file);
+    void PlayerShowText(int time);
 
 private:
     CDC  *m_pDrawDC;
@@ -60,4 +62,10 @@ public:
     afx_msg void   OnVRenderType();
     afx_msg void   OnTakeSnapshot();
     afx_msg void   OnStepForward();
+    afx_msg void   OnStepBackward();
+    afx_msg void   OnPlaySpeedDec();
+    afx_msg void   OnPlaySpeedInc();
+    afx_msg void   OnPlaySpeedType();
+    afx_msg void   OnVdevD3dRotate();
+    afx_msg void   OnRecordVideo();
 };

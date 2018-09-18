@@ -1,6 +1,6 @@
 #pragma once
 extern "C" {
-#include "fanplayer.h"
+#include "ffplayer.h"
 }
 
 class CPlayerInterface

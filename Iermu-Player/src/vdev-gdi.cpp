@@ -1,4 +1,5 @@
 // 包含头文件
+#include <tchar.h>
 #include "vdev.h"
 
 extern "C" {
@@ -29,22 +30,27 @@ static void* video_render_thread_proc(void *param)
         sem_wait(&c->semr);
         if (c->status & VDEV_CLOSE) break;
 
-        if (c->refresh_flag) {
-            c->refresh_flag = 0;
-            vdev_refresh_background(c);
-        }
-
-        int64_t vpts = c->vpts = c->ppts[c->head];
-        if (vpts != -1) {
+        if (vdev_refresh_background(c) && c->ppts[c->head] != -1) {
             SelectObject(c->hdcsrc, c->hbitmaps[c->head]);
             if (c->textt) {
+                if (c->status & VDEV_CONFIG_FONT) {
+                    c->status &= ~VDEV_CONFIG_FONT;
+                    LOGFONT logfont = {};
+                    _tcscpy_s(logfont.lfFaceName, _countof(logfont.lfFaceName), c->font_name);
+                    logfont.lfHeight = c->font_size;
+                    HFONT hfont = CreateFontIndirect(&logfont);
+                    SelectObject(c->hdcsrc, hfont);
+                    if (c->hfont) DeleteObject(c->hfont);
+                    c->hfont = hfont;
+                }
                 SetTextColor(c->hdcsrc, c->textc & 0xffffff);
-                TextOutA(c->hdcsrc, c->textx, c->texty, c->textt, (int)strlen(c->textt));
+                TextOut(c->hdcsrc, c->textx, c->texty, c->textt, (int)_tcsclen(c->textt));
             }
             BitBlt(c->hdcdst, c->x, c->y, c->w, c->h, c->hdcsrc, 0, 0, SRCCOPY);
+            c->vpts = c->ppts[c->head];
         }
 
-        av_log(NULL, AV_LOG_DEBUG, "vpts: %lld\n", vpts);
+        av_log(NULL, AV_LOG_DEBUG, "vpts: %lld\n", c->vpts);
         if (++c->head == c->bufnum) c->head = 0;
         sem_post(&c->semw);
 
@@ -182,13 +188,6 @@ void* vdev_gdi_create(void *surface, int bufnum, int w, int h, int frate)
         av_log(NULL, AV_LOG_ERROR, "failed to allocate resources for vdev-gdi !\n");
         exit(0);
     }
-
-    LOGFONT logfont;
-    memset(&logfont, 0, sizeof(logfont));
-    wcscpy(logfont.lfFaceName, TEXT(DEF_FONT_NAME));
-    logfont.lfHeight = DEF_FONT_SIZE;
-    ctxt->hfont = CreateFontIndirect(&logfont);
-    SelectObject(ctxt->hdcsrc, ctxt->hfont);
     SetBkMode(ctxt->hdcsrc, TRANSPARENT);
 
     // create video rendering thread

@@ -1,5 +1,15 @@
-﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(388,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (iermuplayer.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+﻿  veffect.cpp
+  vdev-gdi.cpp
+  vdev-d3d.cpp
+  vdev-cmn.cpp
+  snapshot.cpp
+  recorder.cpp
+  pktqueue.cpp
+  ffrender.cpp
+  ffplayer.cpp
+  dxva2hwa.cpp
+  adev-win.cpp
+  adev-cmn.cpp
+  正在生成代码...
+     正在创建库 D:\player\Iermu-Aitools\Debug\Iermu-Player.lib 和对象 D:\player\Iermu-Aitools\Debug\Iermu-Player.exp
   fanplayer.vcxproj -> D:\player\Iermu-Aitools\Debug\Iermu-Player.dll
-  系统找不到指定的文件。
-C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppCommon.targets(132,5): error MSB3073: 命令“move  D:\player\Iermu-Aitools\Debug\Iermu-Player.lib D:\player\Iermu-Aitools\Iermu-Aitools\lib
-C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppCommon.targets(132,5): error MSB3073: :VCEnd”已退出，代码为 1。

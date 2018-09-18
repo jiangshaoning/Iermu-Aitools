@@ -20,7 +20,7 @@
     <ClCompile Include="..\..\src\dxva2hwa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\fanplayer.cpp">
+    <ClCompile Include="..\..\src\ffplayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ffrender.cpp">
@@ -55,7 +55,7 @@
     <ClInclude Include="..\..\src\dxva2hwa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\fanplayer.h">
+    <ClInclude Include="..\..\src\ffplayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\ffrender.h">

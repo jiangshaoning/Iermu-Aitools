@@ -54,7 +54,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\ffmpeg-win32\include;..\pthreads-win32\include;..\dx9sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dx9sdk\include;..\pthreads\include;..\ffmpeg\include;..\soundtouch\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;FFPLAYER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -64,21 +64,21 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>d3d9.lib;d3dx9.lib;winmm.lib;msimg32.lib;pthread.lib;avutil.lib;avcodec.lib;avformat.lib;avdevice.lib;avfilter.lib;swscale.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\ffmpeg-win32\bin;..\pthreads-win32\lib;..\dx9sdk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d9.lib;d3dx9.lib;winmm.lib;msimg32.lib;pthread.lib;avutil.lib;avcodec.lib;avformat.lib;avdevice.lib;avfilter.lib;swscale.lib;swresample.lib;soundtouch.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\dx9sdk\lib;..\pthreads\lib;..\ffmpeg\bin;..\soundtouch\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>fanplayer.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
-    <PostBuildEvent>
-      <Command>move  $(OutDir)$(ProjectName).lib $(SolutionDir)Iermu-Aitools\lib</Command>
-    </PostBuildEvent>
+    <Manifest>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\ffmpeg-win32\include;..\pthreads-win32\include;..\dx9sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dx9sdk\include;..\pthreads\include;..\ffmpeg\include;..\soundtouch\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;FFPLAYER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -86,8 +86,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>d3d9.lib;d3dx9.lib;winmm.lib;msimg32.lib;pthread.lib;avutil.lib;avcodec.lib;avformat.lib;avdevice.lib;avfilter.lib;swscale.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\ffmpeg-win32\bin;..\pthreads-win32\lib;..\dx9sdk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d9.lib;d3dx9.lib;winmm.lib;msimg32.lib;pthread.lib;avutil.lib;avcodec.lib;avformat.lib;avdevice.lib;avfilter.lib;swscale.lib;swresample.lib;soundtouch.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\dx9sdk\lib;..\pthreads\lib;..\ffmpeg\bin;..\soundtouch\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>fanplayer.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -97,14 +97,17 @@
       <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>move  $(OutDir)$(ProjectName).lib $(SolutionDir)Iermu-Aitools\lib</Command>
+      <Command>copy  $(OutDir)$(ProjectName).lib $(SolutionDir)Iermu-Aitools\lib\player</Command>
     </PostBuildEvent>
+    <Manifest>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\adev-cmn.cpp" />
     <ClCompile Include="..\..\src\adev-win.cpp" />
     <ClCompile Include="..\..\src\dxva2hwa.cpp" />
-    <ClCompile Include="..\..\src\fanplayer.cpp" />
+    <ClCompile Include="..\..\src\ffplayer.cpp" />
     <ClCompile Include="..\..\src\ffrender.cpp" />
     <ClCompile Include="..\..\src\pktqueue.cpp" />
     <ClCompile Include="..\..\src\recorder.cpp" />
@@ -117,7 +120,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\adev.h" />
     <ClInclude Include="..\..\src\dxva2hwa.h" />
-    <ClInclude Include="..\..\src\fanplayer.h" />
+    <ClInclude Include="..\..\src\ffplayer.h" />
     <ClInclude Include="..\..\src\ffrender.h" />
     <ClInclude Include="..\..\src\pktqueue.h" />
     <ClInclude Include="..\..\src\recorder.h" />

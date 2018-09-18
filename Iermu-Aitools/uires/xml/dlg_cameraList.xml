@@ -5,7 +5,7 @@
   <imgbtn name="btn_camerainfo_ref" skin="btn.ref" pos="[10, {0" ></imgbtn>
   <window pos="0, [20, -0, -0" colorBkgnd="@color/white" >
     <window name="refresh_progress" pos="0, [0, -0, -0" show="0" display ="0" animate="1">
-      <text pos="|-0, |-0" offset="-0.5, -0.5" font="adding:3" colorText="@color/black" align="center">正在刷新列表中...</text>
+      <text pos="|-0, |-0" offset="-0.5, -0.5" font="adding:11" colorText="@color/black" align="center">正在刷新列表中...</text>
     </window>
    
     <mclistview name="cameralist_win" pos="0,[0,-0,-0" headerHeight="50" show="1">

@@ -64,7 +64,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\ffmpeg-win32\include;..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\ffmpeg\include;..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -84,9 +84,10 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Message>copy ffmpeg and pthreads dlls</Message>
-      <Command>copy "$(SolutionDir)\pthreads-win32\dll\*.dll" "$(TargetDir)" /y
-copy "$(SolutionDir)\ffmpeg-win32\bin\*.dll" "$(TargetDir)" /y
+      <Message>copy ffmpeg, pthreads and soundtouch dlls</Message>
+      <Command>copy "$(SolutionDir)\pthreads\dll\*.dll" "$(TargetDir)" /y
+copy "$(SolutionDir)\ffmpeg\bin\*.dll" "$(TargetDir)" /y
+copy "$(SolutionDir)\soundtouch\bin\*.dll" "$(TargetDir)" /y
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -101,7 +102,7 @@ copy "$(SolutionDir)\ffmpeg-win32\bin\*.dll" "$(TargetDir)" /y
       <ValidateAllParameters>false</ValidateAllParameters>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\ffmpeg-win32\include;..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\ffmpeg\include;..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -123,9 +124,10 @@ copy "$(SolutionDir)\ffmpeg-win32\bin\*.dll" "$(TargetDir)" /y
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Message>copy ffmpeg and pthreads dlls</Message>
-      <Command>copy "$(SolutionDir)\pthreads-win32\dll\*.dll" "$(TargetDir)" /y
-copy "$(SolutionDir)\ffmpeg-win32\bin\*.dll" "$(TargetDir)" /y
+      <Message>copy ffmpeg, pthreads and soundtouch dlls</Message>
+      <Command>copy "$(SolutionDir)\pthreads\dll\*.dll" "$(TargetDir)" /y
+copy "$(SolutionDir)\ffmpeg\bin\*.dll" "$(TargetDir)" /y
+copy "$(SolutionDir)\soundtouch\bin\*.dll" "$(TargetDir)" /y
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -148,9 +150,6 @@ copy "$(SolutionDir)\ffmpeg-win32\bin\*.dll" "$(TargetDir)" /y
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="player.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\player.rc2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\fanplayer\fanplayer.vcxproj">

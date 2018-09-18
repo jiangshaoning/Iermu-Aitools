@@ -1,7 +1,7 @@
 ﻿  adev-cmn.cpp
   adev-win.cpp
   dxva2hwa.cpp
-  fanplayer.cpp
+  ffplayer.cpp
   ffrender.cpp
   pktqueue.cpp
   recorder.cpp
@@ -14,4 +14,4 @@
   正在生成代码
   已完成代码的生成
   fanplayer.vcxproj -> D:\player\Iermu-Aitools\Release\Iermu-Player.dll
-  移动了         1 个文件。
+  已复制         1 个文件。

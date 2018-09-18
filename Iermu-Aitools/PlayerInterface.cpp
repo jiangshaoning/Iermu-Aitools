@@ -42,7 +42,7 @@ void CPlayerInterface::init(HWND parent)
 
 	memset(&m_Params, 0, sizeof(m_Params));
 	m_Params.adev_render_type = ADEV_RENDER_TYPE_WAVEOUT;
-	m_Params.vdev_render_type = VDEV_RENDER_TYPE_D3D;
+	m_Params.vdev_render_type = VDEV_RENDER_TYPE_GDI;
 	m_Params.init_timeout = 10000;
 }
 
@@ -75,7 +75,7 @@ int CPlayerInterface::ffplayWithUrl(const char* playurl)
 INT_PTR CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
-	int param = 0;
+	PLAYER_INIT_PARAMS params = {0};
 	CPlayerInterface *pThisInstance = (CPlayerInterface*)::GetWindowLong(hDlg, GWL_USERDATA);
 	switch (message)
 	{
@@ -107,7 +107,7 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 			break;
 
-		case MSG_FFPLAYER:
+		case MSG_FANPLAYER:
 			if (pThisInstance)
 			{
 				switch (wParam)
@@ -121,7 +121,8 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 						//SetEvent(pThisInstance->m_hEvent);					
 						break;
 					case MSG_OPEN_DONE:
-						param = -0;  player_setparam(pThisInstance->m_hplayer, PARAM_AUDIO_VOLUME, &param);
+						params.audio_stream_cur = -1;
+						player_setparam(pThisInstance->m_hplayer, PARAM_AUDIO_VOLUME, &params);
 						player_play(pThisInstance->m_hplayer);
 						break;
 					case MSG_OPEN_FAILED:

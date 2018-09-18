@@ -12,6 +12,10 @@ extern "C" {
 #include "libswscale/swscale.h"
 }
 
+#if CONFIG_ENABLE_SOUNDTOUCH
+#include <soundtouch.h>
+#endif
+
 #ifdef WIN32
 #pragma warning(disable:4311)
 #pragma warning(disable:4312)
@@ -42,18 +46,20 @@ typedef struct
     AUDIOBUF      *adev_hdr_cur;
 
     // video render rect
-    int            render_xcur;
-    int            render_ycur;
-    int            render_xnew;
-    int            render_ynew;
-    int            render_wcur;
-    int            render_hcur;
-    int            render_wnew;
-    int            render_hnew;
+    int            rect_xcur;
+    int            rect_ycur;
+    int            rect_xnew;
+    int            rect_ynew;
+    int            rect_wcur;
+    int            rect_hcur;
+    int            rect_wnew;
+    int            rect_hnew;
 
     // playback speed
-    int            render_speed_cur;
-    int            render_speed_new;
+    int            speed_value_cur;
+    int            speed_value_new;
+    int            speed_type_cur;
+    int            speed_type_new;
 
 #if CONFIG_ENABLE_VEFFECT
     // visual effect
@@ -63,21 +69,24 @@ typedef struct
     int            veffect_y;
     int            veffect_w;
     int            veffect_h;
-    pthread_t      veffect_thread;
 #endif
 
     // render status
-    #define RENDER_CLOSE    (1 << 0)
-    #define RENDER_PAUSE    (1 << 1)
-    #define RENDER_SNAPSHOT (1 << 2)  // take snapshot
-    #define RENDER_SEEKSTEP (1 << 3)  // seek step
+    #define RENDER_CLOSE       (1 << 0)
+    #define RENDER_PAUSE       (1 << 1)
+    #define RENDER_SNAPSHOT    (1 << 2)  // take snapshot
+    #define RENDER_STEPFORWARD (1 << 3)  // step forward
     int            render_status;
 
 #if CONFIG_ENABLE_SNAPSHOT
     // snapshot
-    char           snapfile[MAX_PATH];
+    char           snapfile[PATH_MAX];
     int            snapwidth;
     int            snapheight;
+#endif
+
+#if CONFIG_ENABLE_SOUNDTOUCH
+    void          *stcontext;
 #endif
 } RENDER;
 
@@ -85,35 +94,13 @@ typedef struct
 static void render_setspeed(RENDER *render, int speed)
 {
     if (speed > 0) {
-        // set vdev frame rate
-        int framerate = (int)((render->frame_rate.num * speed) / (render->frame_rate.den * 100.0) + 0.5);
-        vdev_setparam(render->vdev, PARAM_VDEV_FRAME_RATE, &framerate);
+        // set vdev playback speed
+        vdev_setparam(render->vdev, PARAM_PLAY_SPEED_VALUE, &speed);
 
-        // set render_speed_new to triger swr_context re-create
-        render->render_speed_new = speed;
+        // set speed_value_new to triger swr_context re-create
+        render->speed_value_new = speed;
     }
 }
-
-#if CONFIG_ENABLE_VEFFECT
-static void* render_veffect_thread(void *param)
-{
-    RENDER *render = (RENDER*)param;
-    int     timeus = 1000000LL * render->frame_rate.den / render->frame_rate.num;
-    while (!(render->render_status & RENDER_CLOSE)) {
-        if (render->veffect_type != VISUAL_EFFECT_DISABLE) {
-            void *buf = NULL;
-            int   len = 0;
-            adev_curdata  (render->adev, &buf, &len);
-            veffect_render(render->veffect_context,
-                render->veffect_x, render->veffect_y,
-                render->veffect_w, render->veffect_h,
-                render->veffect_type, buf, len);
-        }
-        av_usleep(timeus);
-    }
-    return NULL;
-}
-#endif
 
 // º¯ÊýÊµÏÖ
 void* render_open(int adevtype, int srate, AVSampleFormat sndfmt, int64_t ch_layout,
@@ -128,8 +115,8 @@ void* render_open(int adevtype, int srate, AVSampleFormat sndfmt, int64_t ch_lay
     // init for video
     render->video_width  = w;
     render->video_height = h;
-    render->render_wnew  = w;
-    render->render_hnew  = h;
+    render->rect_wnew    = w;
+    render->rect_hnew    = h;
     render->frame_rate   = frate;
     render->pixel_fmt    = pixfmt;
     if (render->pixel_fmt == AV_PIX_FMT_NONE) {
@@ -144,7 +131,12 @@ void* render_open(int adevtype, int srate, AVSampleFormat sndfmt, int64_t ch_lay
     // init for visual effect
 #if CONFIG_ENABLE_VEFFECT
     render->veffect_context = veffect_create(surface);
-    pthread_create(&render->veffect_thread, NULL, render_veffect_thread, render);
+#endif
+
+#if CONFIG_ENABLE_SOUNDTOUCH
+    render->stcontext = soundtouch_createInstance();
+    soundtouch_setSampleRate(render->stcontext, ADEV_SAMPLE_RATE);
+    soundtouch_setChannels  (render->stcontext, 2);
 #endif
 
     // create adev & vdev
@@ -175,7 +167,6 @@ void render_close(void *hrender)
     render->render_status = RENDER_CLOSE;
 
 #if CONFIG_ENABLE_VEFFECT
-    pthread_join(render->veffect_thread, NULL);
     veffect_destroy(render->veffect_context);
 #endif
 
@@ -197,77 +188,151 @@ void render_close(void *hrender)
     }
     //-- video --//
 
+#if CONFIG_ENABLE_SOUNDTOUCH
+    soundtouch_destroyInstance(render->stcontext);
+#endif
+
     // free context
     free(render);
 }
 
-void render_audio(void *hrender, AVFrame *audio)
+#if CONFIG_ENABLE_SOUNDTOUCH
+static int render_audio_soundtouch(RENDER *render, AVFrame *audio)
 {
-    RENDER *render  = (RENDER*)hrender;
-    int     sampnum = 0;
-    int64_t apts    = audio->pts;
+    int16_t  buf[1024];
+    int16_t *out = buf;
+    int      num_samp;
+    int      num_st;
 
-    if (!render || !render->adev) return;
+    num_samp = swr_convert(render->swr_context,
+        (uint8_t**)&out, 1024 / 2,
+        (const uint8_t**)audio->extended_data, audio->nb_samples);
+    audio->extended_data = NULL;
+    audio->nb_samples    = 0;
+
+    soundtouch_putSamples_i16(render->stcontext, out, num_samp);
+    num_st = soundtouch_numSamples(render->stcontext);
     do {
         if (render->adev_buf_avail == 0) {
             adev_lock(render->adev, &render->adev_hdr_cur);
-            apts += 10 * render->render_speed_cur * render->frame_rate.den / render->frame_rate.num;
+            if (render->adev_hdr_cur) {
+                render->adev_buf_avail = (int     )render->adev_hdr_cur->size;
+                render->adev_buf_cur   = (uint8_t*)render->adev_hdr_cur->data;
+            }
+#if CONFIG_ENABLE_VEFFECT
+            if (render->veffect_type != VISUAL_EFFECT_DISABLE) {
+                veffect_render(render->veffect_context, render->veffect_x, render->veffect_y,
+                    render->veffect_w, render->veffect_h, render->veffect_type, render->adev);
+            }
+#endif
+        }
+        num_st = soundtouch_receiveSamples_i16(render->stcontext, (int16_t*)render->adev_buf_cur, render->adev_buf_avail / 4);
+        render->adev_buf_avail -= num_st * 4;
+        render->adev_buf_cur   += num_st * 4;
+        if (render->adev_buf_avail == 0) {
+            audio->pts += 10 * render->speed_value_cur * render->frame_rate.den / render->frame_rate.num;
+            adev_unlock(render->adev, audio->pts);
+        }
+    } while (num_st != 0);
+
+    return num_samp;
+}
+#endif
+
+static int render_audio_swresample(RENDER *render, AVFrame *audio)
+{
+    int num_samp;
+
+    if (render->adev_buf_avail == 0) {
+        adev_lock(render->adev, &render->adev_hdr_cur);
+        if (render->adev_hdr_cur) {
             render->adev_buf_avail = (int     )render->adev_hdr_cur->size;
             render->adev_buf_cur   = (uint8_t*)render->adev_hdr_cur->data;
         }
+#if CONFIG_ENABLE_VEFFECT
+        if (render->veffect_type != VISUAL_EFFECT_DISABLE) {
+            veffect_render(render->veffect_context, render->veffect_x, render->veffect_y,
+                render->veffect_w, render->veffect_h, render->veffect_type, render->adev);
+        }
+#endif
+    }
 
-        if (render->render_speed_cur != render->render_speed_new) {
-            render->render_speed_cur = render->render_speed_new;
+    //++ do resample audio data ++//
+    num_samp = swr_convert(render->swr_context,
+        (uint8_t**)&render->adev_buf_cur, render->adev_buf_avail / 4,
+        (const uint8_t**)audio->extended_data, audio->nb_samples);
+    audio->extended_data    = NULL;
+    audio->nb_samples       = 0;
+    render->adev_buf_avail -= num_samp * 4;
+    render->adev_buf_cur   += num_samp * 4;
+    //-- do resample audio data --//
+
+    if (render->adev_buf_avail == 0) {
+        audio->pts += 10 * render->speed_value_cur * render->frame_rate.den / render->frame_rate.num;
+        adev_unlock(render->adev, audio->pts);
+    }
+
+    return num_samp;
+}
+
+void render_audio(void *hrender, AVFrame *audio)
+{
+    if (!hrender) return;
+    RENDER *render  = (RENDER*)hrender;
+    int     sampnum;
+
+    do {
+        if (  render->speed_value_cur != render->speed_value_new
+           || render->speed_type_cur  != render->speed_type_new ) {
+            render->speed_value_cur = render->speed_value_new;
+            render->speed_type_cur  = render->speed_type_new ;
+
             //++ allocate & init swr context
+            int samprate = render->speed_type_cur ? ADEV_SAMPLE_RATE : (int)(ADEV_SAMPLE_RATE * 100.0 / render->speed_value_cur);
             if (render->swr_context) {
                 swr_free(&render->swr_context);
             }
-            int samprate = (int)(ADEV_SAMPLE_RATE * 100.0 / render->render_speed_cur);
             render->swr_context = swr_alloc_set_opts(NULL, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, samprate,
                 render->chan_layout, render->sample_fmt, render->sample_rate, 0, NULL);
             swr_init(render->swr_context);
             //-- allocate & init swr context
+
+#if CONFIG_ENABLE_SOUNDTOUCH
+            if (render->speed_type_cur) {
+                soundtouch_setTempo(render->stcontext, (float)render->speed_value_cur / 100);
+            }
+#endif
         }
 
-        //++ do resample audio data ++//
-        sampnum = swr_convert(render->swr_context,
-            (uint8_t**)&render->adev_buf_cur, render->adev_buf_avail / 4,
-            (const uint8_t**)audio->extended_data, audio->nb_samples);
-        audio->extended_data    = NULL;
-        audio->nb_samples       = 0;
-        render->adev_buf_avail -= sampnum * 4;
-        render->adev_buf_cur   += sampnum * 4;
-        //-- do resample audio data --//
-
-        if (render->adev_buf_avail == 0) {
-            adev_unlock(render->adev, apts);
+#if CONFIG_ENABLE_SOUNDTOUCH
+        if (render->speed_type_cur && render->speed_value_cur != 100) {
+            sampnum = render_audio_soundtouch(render, audio);
+        } else
+#endif
+        {
+            sampnum = render_audio_swresample(render, audio);
         }
     } while (sampnum > 0);
 }
 
 void render_video(void *hrender, AVFrame *video)
 {
+    if (!hrender) return;
     RENDER  *render = (RENDER*)hrender;
-    AVFrame  picture;
 
-    // init picture
-    memset(&picture, 0, sizeof(AVFrame));
-
-    if (!render || !render->vdev) return;
     do {
         VDEV_COMMON_CTXT *vdev = (VDEV_COMMON_CTXT*)render->vdev;
-        if (  render->render_xcur != render->render_xnew
-           || render->render_ycur != render->render_ynew
-           || render->render_wcur != render->render_wnew
-           || render->render_hcur != render->render_hnew ) {
-            render->render_xcur = render->render_xnew;
-            render->render_ycur = render->render_ynew;
-            render->render_wcur = render->render_wnew;
-            render->render_hcur = render->render_hnew;
+        if (  render->rect_xcur != render->rect_xnew
+           || render->rect_ycur != render->rect_ynew
+           || render->rect_wcur != render->rect_wnew
+           || render->rect_hcur != render->rect_hnew ) {
+            render->rect_xcur = render->rect_xnew;
+            render->rect_ycur = render->rect_ynew;
+            render->rect_wcur = render->rect_wnew;
+            render->rect_hcur = render->rect_hnew;
 
             // vdev set rect
-            vdev_setrect(render->vdev, render->render_xcur, render->render_ycur,
-                render->render_wcur, render->render_hcur);
+            vdev_setrect(render->vdev, render->rect_xcur, render->rect_ycur, render->rect_wcur, render->rect_hcur);
 
             // we need recreate sws
             if (!render->sws_context) {
@@ -282,6 +347,9 @@ void render_video(void *hrender, AVFrame *video)
         if (video->format == AV_PIX_FMT_DXVA2_VLD) {
             vdev_setparam(render->vdev, PARAM_VDEV_POST_SURFACE, video);
         } else {
+            AVFrame picture;
+            picture.data[0]     = NULL;
+            picture.linesize[0] = 0;
             vdev_lock(render->vdev, picture.data, picture.linesize);
             if (picture.data[0] && video->pts != -1) {
                 sws_scale(render->sws_context, video->data, video->linesize, 0, render->video_height, picture.data, picture.linesize);
@@ -296,14 +364,10 @@ void render_video(void *hrender, AVFrame *video)
             render->render_status &= ~RENDER_SNAPSHOT;
         }
 #endif
+    } while ((render->render_status & RENDER_PAUSE) && !(render->render_status & RENDER_STEPFORWARD));
 
-        //++ seek step
-        if (render->render_status & RENDER_SEEKSTEP) {
-            render->render_status &= ~RENDER_SEEKSTEP;
-            break;
-        }
-        //-- seek step
-    } while (render->render_status & RENDER_PAUSE);
+    // clear step forward flag
+    render->render_status &= ~RENDER_STEPFORWARD;
 }
 
 void render_setrect(void *hrender, int type, int x, int y, int w, int h)
@@ -312,10 +376,10 @@ void render_setrect(void *hrender, int type, int x, int y, int w, int h)
     RENDER *render = (RENDER*)hrender;
     switch (type) {
     case 0:
-        render->render_xnew = x;
-        render->render_ynew = y;
-        render->render_wnew = w > 1 ? w : 1;
-        render->render_hnew = h > 1 ? h : 1;
+        render->rect_xnew = x;
+        render->rect_ynew = y;
+        render->rect_wnew = w > 1 ? w : 1;
+        render->rect_hnew = h > 1 ? h : 1;
         break;
 #if CONFIG_ENABLE_VEFFECT
     case 1:
@@ -401,8 +465,11 @@ void render_setparam(void *hrender, int id, void *param)
     case PARAM_AUDIO_VOLUME:
         adev_setparam(render->adev, id, param);
         break;
-    case PARAM_PLAY_SPEED:
+    case PARAM_PLAY_SPEED_VALUE:
         render_setspeed(render, *(int*)param);
+        break;
+    case PARAM_PLAY_SPEED_TYPE:
+        render->speed_type_new = *(int*)param;
         break;
 #if CONFIG_ENABLE_VEFFECT
     case PARAM_VISUAL_EFFECT:
@@ -411,16 +478,17 @@ void render_setparam(void *hrender, int id, void *param)
             veffect_render(render->veffect_context,
                 render->veffect_x, render->veffect_y,
                 render->veffect_w, render->veffect_h,
-                VISUAL_EFFECT_DISABLE, 0, 0);
+                VISUAL_EFFECT_DISABLE, render->adev);
         }
         break;
 #endif
     case PARAM_AVSYNC_TIME_DIFF:
     case PARAM_VDEV_POST_SURFACE:
+    case PARAM_VDEV_D3D_ROTATE:
         vdev_setparam(render->vdev, id, param);
         break;
-    case PARAM_RENDER_SEEK_STEP:
-        render->render_status |= RENDER_SEEKSTEP;
+    case PARAM_RENDER_STEPFORWARD:
+        render->render_status |= RENDER_STEPFORWARD;
         break;
     }
 }
@@ -436,14 +504,21 @@ void render_getparam(void *hrender, int id, void *param)
         if (vdev->status & VDEV_COMPLETED) {
             *(int64_t*)param  = -1; // means completed
         } else {
-            *(int64_t*)param = vdev->apts > vdev->vpts ? vdev->apts : vdev->vpts;
+            if (vdev->apts >= 0 || vdev->vpts >= 0) {
+                *(int64_t*)param = vdev->apts > vdev->vpts ? vdev->apts : vdev->vpts;
+            } else {
+                *(int64_t*)param = AV_NOPTS_VALUE;
+            }
         }
         break;
     case PARAM_AUDIO_VOLUME:
         adev_getparam(render->adev, id, param);
         break;
-    case PARAM_PLAY_SPEED:
-        *(int*)param = render->render_speed_cur;
+    case PARAM_PLAY_SPEED_VALUE:
+        *(int*)param = render->speed_value_cur ? render->speed_value_cur : render->speed_value_new;
+        break;
+    case PARAM_PLAY_SPEED_TYPE:
+        *(int*)param = render->speed_type_cur;
         break;
 #if CONFIG_ENABLE_VEFFECT
     case PARAM_VISUAL_EFFECT:
@@ -452,6 +527,7 @@ void render_getparam(void *hrender, int id, void *param)
 #endif
     case PARAM_AVSYNC_TIME_DIFF:
     case PARAM_VDEV_GET_D3DDEV:
+    case PARAM_VDEV_D3D_ROTATE:
         vdev_getparam(render->vdev, id, param);
         break;
     case PARAM_ADEV_GET_CONTEXT:

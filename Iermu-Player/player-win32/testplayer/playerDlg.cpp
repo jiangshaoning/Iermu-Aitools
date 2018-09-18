@@ -12,6 +12,7 @@
 
 #define TIMER_ID_FIRST_DIALOG  1
 #define TIMER_ID_PROGRESS      2
+#define TIMER_ID_HIDE_TEXT     3
 
 static void get_app_dir(char *path, int size)
 {
@@ -84,6 +85,7 @@ CplayerDlg::CplayerDlg(CWnd* pParent /*=NULL*/)
     m_ffPlayer    = NULL;
     m_bLiveStream = FALSE;
     m_bResetPlayer= FALSE;
+    m_bIsRecording= FALSE;
 }
 
 void CplayerDlg::DoDataExchange(CDataExchange* pDX)
@@ -91,10 +93,10 @@ void CplayerDlg::DoDataExchange(CDataExchange* pDX)
     CDialog::DoDataExchange(pDX);
 }
 
-void CplayerDlg::PlayerReset()
+void CplayerDlg::PlayerReset(PLAYER_INIT_PARAMS *params)
 {
     player_close(m_ffPlayer);
-    m_ffPlayer = player_open(m_strUrl, GetSafeHwnd(), &m_Params);
+    m_ffPlayer = player_open(m_strUrl, GetSafeHwnd(), params);
 }
 
 void CplayerDlg::PlayerOpenFile(TCHAR *file)
@@ -108,25 +110,26 @@ void CplayerDlg::PlayerOpenFile(TCHAR *file)
     // open file dialog
     if (!file) {
         if (dlg.DoModal() == IDOK) {
-            wcscpy(str, dlg.GetPathName());
+            _tcscpy(str, dlg.GetPathName());
         } else {
             OnOK();
             return;
         }
     } else {
-        wcscpy(str, file);
+        _tcscpy(str, file);
     }
-    WideCharToMultiByte(CP_ACP, 0, str, -1, m_strUrl, MAX_PATH, NULL, NULL);
+    WideCharToMultiByte(CP_UTF8, 0, str, -1, m_strUrl, MAX_PATH, NULL, NULL);
 
     // set window title
     SetWindowText(TEXT("testplayer - loading"));
-	//strcpy(m_strUrl, "rtmp://192.168.3.110:1935/live/137898613339");
+
     // player open file
     char ext[MAX_PATH]; _splitpath(m_strUrl, NULL, NULL, NULL, ext);
     if (  strnicmp(m_strUrl, "http://", 7) == 0 && stricmp(ext, ".m3u8") == 0
        || strnicmp(m_strUrl, "rtmp://", 7) == 0
        || strnicmp(m_strUrl, "rtsp://", 7) == 0
        || strnicmp(m_strUrl, "gdigrab://", 10) == 0
+       || strnicmp(m_strUrl, "dshow://", 8) == 0
        || strnicmp(m_strUrl, "vfwcap", 6) == 0
        || stricmp(ext, ".bmp" ) == 0
        || stricmp(ext, ".jpg" ) == 0
@@ -138,8 +141,15 @@ void CplayerDlg::PlayerOpenFile(TCHAR *file)
         m_bLiveStream = FALSE;
     }
 
-    // reset player
-    PlayerReset();
+    PLAYER_INIT_PARAMS params;
+    load_fanplayer_params(&params); // load fanplayer init params
+    PlayerReset(&params); // reset player
+}
+
+void CplayerDlg::PlayerShowText(int time)
+{
+    player_textout(m_ffPlayer, 20, 20, RGB(0, 255, 0), m_strTxt);
+    SetTimer(TIMER_ID_HIDE_TEXT, time, NULL);
 }
 
 BEGIN_MESSAGE_MAP(CplayerDlg, CDialog)
@@ -150,14 +160,20 @@ BEGIN_MESSAGE_MAP(CplayerDlg, CDialog)
     ON_WM_LBUTTONDOWN()
     ON_WM_CTLCOLOR()
     ON_WM_SIZE()
-    ON_COMMAND(ID_OPEN_FILE    , &CplayerDlg::OnOpenFile    )
-    ON_COMMAND(ID_VIDEO_MODE   , &CplayerDlg::OnVideoMode   )
-    ON_COMMAND(ID_EFFECT_MODE  , &CplayerDlg::OnEffectMode  )
-    ON_COMMAND(ID_VRENDER_TYPE , &CplayerDlg::OnVRenderType )
-    ON_COMMAND(ID_AUDIO_STREAM , &CplayerDlg::OnAudioStream )
-    ON_COMMAND(ID_VIDEO_STREAM , &CplayerDlg::OnVideoStream )
-    ON_COMMAND(ID_TAKE_SNAPSHOT, &CplayerDlg::OnTakeSnapshot)
-    ON_COMMAND(ID_STEP_FORWARD , &CplayerDlg::OnStepForward )
+    ON_COMMAND(ID_OPEN_FILE      , &CplayerDlg::OnOpenFile     )
+    ON_COMMAND(ID_VIDEO_MODE     , &CplayerDlg::OnVideoMode    )
+    ON_COMMAND(ID_EFFECT_MODE    , &CplayerDlg::OnEffectMode   )
+    ON_COMMAND(ID_VRENDER_TYPE   , &CplayerDlg::OnVRenderType  )
+    ON_COMMAND(ID_AUDIO_STREAM   , &CplayerDlg::OnAudioStream  )
+    ON_COMMAND(ID_VIDEO_STREAM   , &CplayerDlg::OnVideoStream  )
+    ON_COMMAND(ID_TAKE_SNAPSHOT  , &CplayerDlg::OnTakeSnapshot )
+    ON_COMMAND(ID_STEP_FORWARD   , &CplayerDlg::OnStepForward  )
+    ON_COMMAND(ID_STEP_BACKWARD  , &CplayerDlg::OnStepBackward )
+    ON_COMMAND(ID_PLAY_SPEED_DEC , &CplayerDlg::OnPlaySpeedDec )
+    ON_COMMAND(ID_PLAY_SPEED_INC , &CplayerDlg::OnPlaySpeedInc )
+    ON_COMMAND(ID_PLAY_SPEED_TYPE, &CplayerDlg::OnPlaySpeedType)
+    ON_COMMAND(ID_VDEVD3D_ROTATE , &CplayerDlg::OnVdevD3dRotate)
+    ON_COMMAND(ID_RECORD_VIDEO   , &CplayerDlg::OnRecordVideo  )
 END_MESSAGE_MAP()
 
 
@@ -166,6 +182,9 @@ END_MESSAGE_MAP()
 BOOL CplayerDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
+
+    // init COM
+    CoInitialize(NULL);
 
     // Set the icon for this dialog.  The framework does this automatically
     //  when the application's main window is not a dialog
@@ -180,9 +199,6 @@ BOOL CplayerDlg::OnInitDialog()
 
     // get dc
     m_pDrawDC = GetDC();
-
-    // load fanplayer init params
-    load_fanplayer_params(&m_Params);
 
     // setup init timer
     SetTimer(TIMER_ID_FIRST_DIALOG, 100, NULL);
@@ -229,10 +245,10 @@ void CplayerDlg::OnPaint()
         } else {
             SetWindowText(pos == -1 ? TEXT("testplayer - buffering") : TEXT("testplayer"));
         }
-#if 0// for player_testout test
+#if 0 // for player_testout test
         static int x = 0;
         x++; x %= m_rtClient.right;
-        player_textout(m_ffPlayer, x, 10, 0xff00ff00, "爱耳目内部使用播放器 !");
+        player_textout(m_ffPlayer, x, 10, 0xff00ff00, "testplayer textout test !");
 #endif
         CDialog::OnPaint();
     }
@@ -250,12 +266,19 @@ void CplayerDlg::OnDestroy()
     CDialog::OnDestroy();
     ReleaseDC(m_pDrawDC);
 
+#if 0
+    // save fanplayer init params
+    PLAYER_INIT_PARAMS params;
+    player_getparam(m_ffPlayer, PARAM_PLAYER_INIT_PARAMS, &params);
+    save_fanplayer_params(&params);
+#endif
+
     // close player
     player_close(m_ffPlayer);
     m_ffPlayer = NULL;
 
-    // save fanplayer init params
-    save_fanplayer_params(&m_Params);
+    // uninit COM
+    CoUninitialize();
 }
 
 void CplayerDlg::OnTimer(UINT_PTR nIDEvent)
@@ -277,6 +300,12 @@ void CplayerDlg::OnTimer(UINT_PTR nIDEvent)
         InvalidateRect(&rect, FALSE);
         break;
 
+    case TIMER_ID_HIDE_TEXT:
+        KillTimer(TIMER_ID_HIDE_TEXT);
+        player_textout(m_ffPlayer, 0, 0, 0, NULL);
+        m_strTxt[0] = '\0';
+        break;
+
     default:
         CDialog::OnTimer(nIDEvent);
         break;
@@ -290,7 +319,7 @@ void CplayerDlg::OnLButtonDown(UINT nFlags, CPoint point)
             LONGLONG total = 1;
             player_getparam(m_ffPlayer, PARAM_MEDIA_DURATION, &total);
             KillTimer(TIMER_ID_PROGRESS);
-            player_seek(m_ffPlayer, total * point.x / m_rtClient.right, SEEK_PRECISELY);
+            player_seek(m_ffPlayer, total * point.x / m_rtClient.right, 0);
             SetTimer (TIMER_ID_PROGRESS, 100, NULL);
         } else {
             if (!m_bPlayPause) player_pause(m_ffPlayer);
@@ -327,7 +356,7 @@ BOOL CplayerDlg::PreTranslateMessage(MSG *pMsg)
 {
     if (TranslateAccelerator(GetSafeHwnd(), m_hAcc, pMsg)) return TRUE;
 
-    if (pMsg->message == MSG_FFPLAYER) {
+    if (pMsg->message == MSG_FANPLAYER) {
         switch (pMsg->wParam)
         {
         case MSG_OPEN_DONE:
@@ -335,7 +364,8 @@ BOOL CplayerDlg::PreTranslateMessage(MSG *pMsg)
             if (TRUE) { // set player dynamic params
                 int param = 0;
                 //++ set dynamic player params
-//              param = 150; player_setparam(dlg->m_ffPlayer, PARAM_PLAY_SPEED  , &param);
+//              param = 150; player_setparam(m_ffPlayer, PARAM_PLAY_SPEED_VALUE, &param);
+//              param = 1  ; player_setparam(m_ffPlayer, PARAM_PLAY_SPEED_TYPE , &param);
 
                 // software volume scale -30dB to 12dB
                 // range for volume is [-182, 73]
@@ -345,8 +375,9 @@ BOOL CplayerDlg::PreTranslateMessage(MSG *pMsg)
             player_setrect(m_ffPlayer, 0, 0, 0, m_rtClient.right, m_rtClient.bottom - 2);
             player_setrect(m_ffPlayer, 1, 0, 0, m_rtClient.right, m_rtClient.bottom - 2);
             if (m_bResetPlayer) {
-                if (!m_bPlayPause) player_play(m_ffPlayer);
-                player_seek(m_ffPlayer, m_llLastPos, SEEK_PRECISELY);
+                if (!m_bPlayPause ) player_play(m_ffPlayer);
+                if (!m_bLiveStream) player_seek(m_ffPlayer, m_llLastPos, 0);
+                if ( m_strTxt[0]  ) PlayerShowText(2000);
                 m_bResetPlayer = FALSE;
             } else {
                 player_play(m_ffPlayer);
@@ -371,18 +402,26 @@ void CplayerDlg::OnOpenFile()
 
 void CplayerDlg::OnAudioStream()
 {
+    PLAYER_INIT_PARAMS params;
+    player_getparam(m_ffPlayer, PARAM_PLAYER_INIT_PARAMS, &params);
     player_getparam(m_ffPlayer, PARAM_MEDIA_POSITION, &m_llLastPos);
-    m_Params.audio_stream_cur++; m_Params.audio_stream_cur %= m_Params.audio_stream_total;
+    params.audio_stream_cur++; params.audio_stream_cur %= params.audio_stream_total + 1;
+    if (params.audio_stream_cur == params.audio_stream_total) params.audio_stream_cur = -1;
     m_bResetPlayer = TRUE;
-    PlayerReset();
+    _stprintf(m_strTxt, TEXT("audio stream: %d"), params.audio_stream_cur);
+    PlayerReset(&params);
 }
 
 void CplayerDlg::OnVideoStream()
 {
+    PLAYER_INIT_PARAMS params;
+    player_getparam(m_ffPlayer, PARAM_PLAYER_INIT_PARAMS, &params);
     player_getparam(m_ffPlayer, PARAM_MEDIA_POSITION, &m_llLastPos);
-    m_Params.video_stream_cur++; m_Params.video_stream_cur %= m_Params.video_stream_total;
+    params.video_stream_cur++; params.video_stream_cur %= params.video_stream_total + 1;
+    if (params.video_stream_cur == params.video_stream_total) params.video_stream_cur = -1;
     m_bResetPlayer = TRUE;
-    PlayerReset();
+    _stprintf(m_strTxt, TEXT("video stream: %d"), params.video_stream_cur);
+    PlayerReset(&params);
 }
 
 void CplayerDlg::OnVideoMode()
@@ -391,6 +430,8 @@ void CplayerDlg::OnVideoMode()
     player_getparam(m_ffPlayer, PARAM_VIDEO_MODE, &mode);
     mode++; mode %= VIDEO_MODE_MAX_NUM;
     player_setparam(m_ffPlayer, PARAM_VIDEO_MODE, &mode);
+    _stprintf(m_strTxt, TEXT("video mode: %d"), mode);
+    PlayerShowText(2000);
 }
 
 void CplayerDlg::OnEffectMode()
@@ -403,21 +444,91 @@ void CplayerDlg::OnEffectMode()
 
 void CplayerDlg::OnVRenderType()
 {
+    PLAYER_INIT_PARAMS params;
+    player_getparam(m_ffPlayer, PARAM_PLAYER_INIT_PARAMS, &params);
     player_getparam(m_ffPlayer, PARAM_MEDIA_POSITION, &m_llLastPos);
-    m_Params.vdev_render_type++; m_Params.vdev_render_type %= VDEV_RENDER_TYPE_MAX_NUM;
+    params.vdev_render_type++; params.vdev_render_type %= VDEV_RENDER_TYPE_MAX_NUM;
     m_bResetPlayer = TRUE;
-    PlayerReset();
+    _stprintf(m_strTxt, TEXT("vdev type: %d"), params.vdev_render_type);
+    PlayerReset(&params);
 }
 
 void CplayerDlg::OnTakeSnapshot()
 {
     player_snapshot(m_ffPlayer, "snapshot.jpg", 0, 0, 1000);
+    _tcscpy(m_strTxt, TEXT("take snapshot to snapshot.jpg"));
+    PlayerShowText(2000);
 }
 
 void CplayerDlg::OnStepForward()
 {
-    player_seek(m_ffPlayer, 0, SEEK_STEP);
+    player_seek(m_ffPlayer, +1, SEEK_STEP_FORWARD);
     m_bPlayPause = TRUE;
+    _tcscpy(m_strTxt, TEXT("step forward"));
+    PlayerShowText(2000);
 }
 
+void CplayerDlg::OnStepBackward()
+{
+    player_seek(m_ffPlayer, -1, SEEK_STEP_BACKWARD);
+    m_bPlayPause = TRUE;
+    _tcscpy(m_strTxt, TEXT("step backward"));
+    PlayerShowText(2000);
+}
+
+void CplayerDlg::OnPlaySpeedDec()
+{
+    int speed;
+    player_getparam(m_ffPlayer, PARAM_PLAY_SPEED_VALUE, &speed);
+    speed -= 10; if (speed < 10) speed = 10;
+    player_setparam(m_ffPlayer, PARAM_PLAY_SPEED_VALUE, &speed);
+
+    _stprintf(m_strTxt, TEXT("speed value: %d"), speed);
+    PlayerShowText(2000);
+}
+
+void CplayerDlg::OnPlaySpeedInc()
+{
+    int speed;
+    player_getparam(m_ffPlayer, PARAM_PLAY_SPEED_VALUE, &speed);
+    speed += 10; if (speed > 200) speed = 200;
+    player_setparam(m_ffPlayer, PARAM_PLAY_SPEED_VALUE, &speed);
+
+    _stprintf(m_strTxt, TEXT("speed value: %d"), speed);
+    PlayerShowText(2000);
+}
+
+void CplayerDlg::OnPlaySpeedType()
+{
+    int type;
+    player_getparam(m_ffPlayer, PARAM_PLAY_SPEED_TYPE, &type);
+    type = !type;
+    player_setparam(m_ffPlayer, PARAM_PLAY_SPEED_TYPE, &type);
+
+    _stprintf(m_strTxt, TEXT("speed type: %s"), type ? TEXT("soundtouch") : TEXT("swresample"));
+    PlayerShowText(2000);
+}
+
+void CplayerDlg::OnVdevD3dRotate()
+{
+    PLAYER_INIT_PARAMS params;
+    player_getparam(m_ffPlayer, PARAM_PLAYER_INIT_PARAMS, &params);
+    if (params.vdev_render_type != VDEV_RENDER_TYPE_D3D) return;
+
+    int angle = 0;
+    player_getparam(m_ffPlayer, PARAM_VDEV_D3D_ROTATE, &angle);
+    angle += 10; angle %= 360;
+    player_setparam(m_ffPlayer, PARAM_VDEV_D3D_ROTATE, &angle);
+
+    _stprintf(m_strTxt, TEXT("rotation: %d"), angle);
+    PlayerShowText(2000);
+}
+
+void CplayerDlg::OnRecordVideo()
+{
+    player_record(m_ffPlayer, m_bIsRecording ? NULL : "record.mp4");
+    m_bIsRecording = !m_bIsRecording;
+    _stprintf(m_strTxt, TEXT("recording %s"), m_bIsRecording ? TEXT("started") : TEXT("stoped"));
+    PlayerShowText(2000);
+}
 
