@@ -212,6 +212,7 @@ void CMainDlg::GoToCameraInfoPage()
 		UpdateCameraInfo();
 		pTab->SetCurSel(_T("camrainfo_page"));
 		SetDisplayProgress(L"camera_ip_win", L"camera_ip_progress");
+		FindChildByName2<SWindow>(L"text_formate_progress")->SetVisible(FALSE, TRUE);
 	}
 }
 
@@ -499,6 +500,7 @@ void CMainDlg::OnMenuLoadLocalPort()
 
 bool CMainDlg::OnFormatSDcard()
 {
+	FindChildByName2<SWindow>(L"text_formate_progress")->SetVisible(TRUE, TRUE);
 	return SendCMD(OPT_FORMAT_SDCARD);
 }
 
@@ -541,6 +543,7 @@ void CMainDlg::BackToTabpage()
 //列表选中到摄像机信息界面
 void CMainDlg::SetCameraInfoPage(int pos)
 {
+	m_curSel = pos;
 	m_switchlist_tab = true;
 	memset(&m_cinfo, 0, sizeof(AICameraInfo));
 	memcpy(&m_cinfo, &m_cinfolist.GetAt(pos), sizeof(AICameraInfo));
@@ -609,7 +612,7 @@ void CMainDlg::UpdateCameraInfo()
 	wchar_t radio[12] = { 0 };
 	char port[32] = { 0 };
 
-	FindChildByName2<SWindow>(L"canmera_playurl")->SetWindowTextW(S_CA2T(m_cinfo.cad.url));
+	FindChildByName2<SEdit>(L"canmera_playurl")->SetWindowTextW(S_CA2T(m_cinfo.cad.url));
 
 	//人脸抓拍开关
 	FindChildByName2<SComboBox>(L"cbx_switch_face")->SetCurSel(m_cinfo.ffs.face_rec & 1);
@@ -1262,6 +1265,18 @@ void CMainDlg::OnPlay()
 	}
 }
 
+void CMainDlg::OnPlayNoVoice()
+{
+	if (strlen(m_cinfo.cad.url) > 0 && m_cinfo.cad.url != NULL)
+	{
+		m_player.ffplayWithUrlNoVoice(m_cinfo.cad.url);
+	}
+	else
+	{
+		MessageBox(NULL, _T("获取到摄像机链接不成功"), _T("提示"), MB_OK | MB_ICONERROR);
+	}
+}
+
 void CMainDlg::GetCameraList()
 {
 	if (CheckIp(1, L"edit_localIp", _T("请输入本机IP"), m_localIp))
@@ -1531,6 +1546,8 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 			}
 			else
 			{
+				//m_cinfolist.RemoveAt(m_curSel);
+				m_cinfolist.SetAt(m_curSel, m_cinfo);
 				MessageBox(NULL, _T("设置通用参数成功！"), _T("提示"), MB_OK);
 			}
 
@@ -1543,6 +1560,7 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 			}
 			else
 			{
+				m_cinfolist.SetAt(m_curSel, m_cinfo);
 				MessageBox(NULL, _T("设置服务参数成功！"), _T("提示"), MB_OK);
 			}
 
@@ -1555,6 +1573,7 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 			}
 			else
 			{
+				m_cinfolist.SetAt(m_curSel, m_cinfo);
 				MessageBox(NULL, SStringT().Format(_T("设置储存参数成功！%s"), pEvt->nData), _T("提示"), MB_OK);
 			}
 
@@ -1567,6 +1586,7 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 			}
 			else
 			{
+				m_cinfolist.SetAt(m_curSel, m_cinfo);
 				MessageBox(NULL, _T("设置其他参数成功！"), _T("提示"), MB_OK);
 			}
 

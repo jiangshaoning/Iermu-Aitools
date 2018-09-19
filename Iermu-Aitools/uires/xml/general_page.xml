@@ -8,16 +8,16 @@
     <text pos="20, 20">人脸抓拍</text>
     <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
     <window pos="|-180,[5" layout="vbox" size="-1,-1" gravity="center">
-      <text size="100,30" align="right">人脸抓拍开关</text>
-      <text size="100,30" align="right">是否只抓正脸</text>
-      <text size="100,30" align="right">抓拍最小宽度</text>
-      <text size="100,30" align="right">抓拍最小高度</text>
-      <text size="100,30" align="right">可信度</text>
-      <text size="100,30" align="right">滞留时间</text>
+      <text size="100,22" extend="4" align="right">人脸抓拍开关</text>
+      <text size="100,22" extend="4" align="right">是否只抓正脸</text>
+      <text size="100,22" extend="4" align="right">抓拍最小宽度</text>
+      <text size="100,22" extend="4" align="right">抓拍最小高度</text>
+      <text size="100,22" extend="4" align="right">可信度</text>
+      <text size="100,22" extend="4" align="right">滞留时间</text>
     </window>
     <window pos="[30,{0" layout="vbox" size="-1,-1" gravity="center">
-      <combobox name="cbx_switch_face" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-        <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+      <combobox name="cbx_switch_face" size="120,22" extend="4" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+        <liststyle class="cls_box">
         </liststyle>
         <editstyle colorText="#000000" colorBkgnd="#FFFFFF"/>
         <items>
@@ -25,8 +25,8 @@
           <item text=" 开启" />
         </items>
       </combobox>
-      <combobox name="cbx_facial" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-        <liststyle class="cls_box" itemSkin="_skin.tab_left"  colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+      <combobox name="cbx_facial" size="120,22" extend="4" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+        <liststyle class="cls_box">
         </liststyle>
         <editstyle colorText="@color/black" colorBkgnd="#FFFFFF"/>
         <items>
@@ -34,32 +34,32 @@
           <item text=" 是" />
         </items>
       </combobox>
-      <edit name="edit_pixel_width" number="1" size="120,26" extend="2" class="cls_edit"></edit>
-      <edit name="edit_pixel_height" number="1" size="120,26" extend="2" class="cls_edit"></edit>
-      <edit name="edit_reliability" number="1" size="120,26" extend="2" class="cls_edit"></edit>
-      <edit name="edit_residence_time" number="1" size="120,26" extend="2" class="cls_edit"></edit>
+      <edit name="edit_pixel_width" number="1" size="120,22" extend="4" class="cls_edit"></edit>
+      <edit name="edit_pixel_height" number="1" size="120,22" extend="4" class="cls_edit"></edit>
+      <edit name="edit_reliability" number="1" size="120,22" extend="4" class="cls_edit"></edit>
+      <edit name="edit_residence_time" number="1" size="120,22" extend="4" class="cls_edit"></edit>
     </window>
     <window pos="[6,{60" layout="vbox" size="-1,-1" gravity="center">
-      <text size="100,30">像素</text>
-      <text size="100,30">像素</text>
-      <text size="100,30">缺省值40</text>
-      <text size="100,30">秒</text>
+      <text size="100,22" extend="4">像素</text>
+      <text size="100,22" extend="4">像素</text>
+      <text size="100,22" extend="4">缺省值40</text>
+      <text size="100,22" extend="4">秒</text>
     </window>
     <!--******************************人脸抓拍******************************-->
 
     <!--******************************图片上传******************************-->
-    <text pos="20, [5">图片上传</text>
+    <text pos="20, [1">图片上传</text>
     <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
 
-    <text pos="|-180,[5" size="100,30" align="right">上传图片</text>
-      <window name="grp_face_img" pos="[30,{5" size="-1,-1" extend="2" layout="hbox">
-        <radio name="radio_1" id="0" checked="1">人脸</radio>
-        <radio extend_left="10dp" id="1" name="radio_2">上半身</radio>
-        <radio extend_left="10dp" id="2" name="radio_3">全身</radio>
-        <radio extend_left="10dp" id="3" name="radio_4">全图+坐标</radio>
+    <text pos="|-180,[5" size="100,22" align="right">上传图片</text>
+      <window name="grp_face_img" pos="[40,{2" size="-1,-1" layout="hbox">
+        <radio name="radio_1" id="0" class="cls_radio" checked="1">人脸</radio>
+        <radio extend_left="10dp" id="1" class="cls_radio" name="radio_2">上半身</radio>
+        <radio extend_left="10dp" id="2" class="cls_radio" name="radio_3">全身</radio>
+        <radio extend_left="10dp" id="3" class="cls_radio" name="radio_4">全图+坐标</radio>
       </window>
-    <text pos="|-180,[5" size="100,30" align="right">上传张数</text>
-    <edit name="eidt_faces_second" number="1" pos="[30,{2" size="120,26" align="left" class="cls_edit"></edit>
+    <text pos="|-180,[8" size="100,22" align="right">上传张数</text>
+    <edit name="eidt_faces_second" number="1" pos="[40,{0" size="120,22" align="left" class="cls_edit"></edit>
     <text pos="[10,{2">张/秒</text>
     <!--******************************图片上传******************************-->
 
@@ -67,17 +67,17 @@
     <text pos="20, [5">直播画面</text>
     <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
     
-    <text pos="|-180,[5" size="100,30" align="right">画面画框</text>
-    <window pos="[30,{5" size="-1,-1" extend="2" layout="hbox">
-      <check name="check_1" checked="1">人脸</check>
-      <check extend_left="10dp" name="check_2">上半身</check>
-      <check extend_left="10dp" name="check_3">全身</check>
-      <check extend_left="10dp" name="check_4">人体</check>
+    <text pos="|-180,[5" size="100,22" align="right">画面画框</text>
+    <window pos="[40,{1" size="-1,-1" layout="hbox">
+      <check name="check_1" class="cls_check" checked="1">人脸</check>
+      <check extend_left="10dp" class="cls_check" name="check_2">上半身</check>
+      <check extend_left="10dp" class="cls_check" name="check_3">全身</check>
+      <check extend_left="10dp" class="cls_check" name="check_4">人体</check>
     </window>
     
-    <text pos="|-180,[5" size="100,30" align="right">人脸打码</text>
-    <combobox name="cbx_mark_face" pos="[30,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-      <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+    <text pos="|-180,[8" size="100,22" align="right">人脸打码</text>
+    <combobox name="cbx_mark_face" pos="[40,{0" size="120,22" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+      <liststyle class="cls_box">
       </liststyle>
       <editstyle colorText="@color/black" colorBkgnd="#FFFFFF"/>
       <items>

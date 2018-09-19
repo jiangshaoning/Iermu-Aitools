@@ -26,7 +26,9 @@
     <file name="ID_SYSBTN_DROP_LARGE" path="image\sysbtn_drop_large.png"/>
     <file name="ID_SYSBTN_DROP_LITTLE" path="image\sysbtn_drop_little.png"/>
     <file name="ID_SYSBTN_RADIO" path="image\sysbtn_radio.png"/>
+    <file name="ID_SYSBTN_FOCUS_RADIO" path="image\sysbtn_focus_radio.png"/>
     <file name="ID_SYSBTN_CHECK" path="image\sysbtn_check.png"/>
+    <file name="ID_SYSBTN_FOCUS_CHECK" path="image\sysbtn_focus_check.png"/>
 		<file name="ID_TAB_MAIN" path="image\skin_tab_main.png" />
 		<file name="ID_TAB_ICON" path="image\skin_tab_icon.png" />
     <file name="ID_PAGE_MAIN" path="image\skin_page_main.png" />
@@ -45,13 +47,15 @@
   <BTN>
     <file name="ID_BLUE_LITTLE_BTN" path="image\btn_blue_little.png"/>
     <file name="ID_BLUE_LARGE_BTN" path="image\btn_blue_large.png"/>
+    <file name="ID_BLUE_UPRIGHT_BTN" path="image\btn_blue_upright.png"/>
+    <file name="ID_BLUE_UPLEFT_BTN" path="image\btn_blue_upleft.png"/>
     <file name="ID_WHITE_BTN" path="image\btn_white.png"/>
     <file name="ID_BACK_BTN" path="image\btn_back.png"/>
     <file name="ID_PRE_BTN" path="image\btn_pre.png"/>
     <file name="ID_REF_BTN" path="image\btn_ref.png"/>
-    <file name="ID_PLAY_BTN" path="image\btn_play.png"/>
-    <file name="ID_SYNC_BTN" path="image\btn_sync.png"/>
-    <file name="ID_FORMAT_BTN" path="image\btn_format.png"/>
+    <file name="ID_WHITE_LEFT_BTN" path="image\btn_white_left.png"/>
+    <file name="ID_WHITE_RIGHT_BTN" path="image\btn_white_right.png"/>
+    <file name="ID_WHITE_MIDDLE_BTN" path="image\btn_white_midlle.png"/>
   </BTN>
   
 	<ICON>

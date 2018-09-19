@@ -49,6 +49,7 @@ private:
 	void SetPicturePath();
 	void SetServer();
 	void OnPlay();
+	void OnPlayNoVoice();
 	void UpdateCameraInfo();
 	void GetTime(DateTime &dt);
 	bool CheckIp(int type, LPCWSTR pszName, LPCWSTR tipName, string &ip);
@@ -85,6 +86,7 @@ protected:
 		EVENT_NAME_COMMAND(L"get_camera_info", GetCameraInfo)				//通过摄像机IP获取信息	
 		EVENT_NAME_COMMAND(L"btn_camerainfo_back", BackToTabpage)			//返回按键
 		EVENT_NAME_COMMAND(L"btn_camerainfo_ref", RefreshCameraList)		//刷新列表
+		EVENT_NAME_COMMAND(L"btn_playLive_novoice", OnPlayNoVoice)			//低延迟直播
 		EVENT_NAME_COMMAND(L"btn_playLive", OnPlay)							//播放直播
 		EVENT_NAME_COMMAND(L"btn_timeSync", SetCameraTime)					//时间同步	
 		EVENT_NAME_COMMAND(L"btn_camera_general", SetCameraGeneral)			//通用设置
@@ -125,4 +127,5 @@ private:
 	SArray<AICameraInfo>	m_cinfolist;		//摄像机的人脸参数信息列表
 	SArray<CameraAddr>		m_iplist;			//摄像机列表id, ip, url
 	string					m_ConfFileName;		//配置文件路径
+	int						m_curSel;			//当前list选中行
 };

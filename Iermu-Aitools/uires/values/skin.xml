@@ -6,8 +6,10 @@
   <imglist name="_skin.sysbtn_restore" src="PNG:ID_SYSBTN_RESTORE" states="3"/>
   <imglist name="_skin.sysbtn_drop_large" src="PNG:ID_SYSBTN_DROP_LARGE" states="3" margin-x="5"/>
   <imglist name="_skin.sysbtn_drop_little" src="PNG:ID_SYSBTN_DROP_LITTLE" states="3"/>
-  <imglist name="_skin.sysbtn_radio" src="PNG:ID_SYSBTN_RADIO" states="3"/>
-  <imglist name="_skin.sysbtn_check" src="PNG:ID_SYSBTN_CHECK" states="3"/>
+  <imglist name="_skin.sysbtn_radio" src="PNG:ID_SYSBTN_RADIO" states="8"/>
+  <imglist name="_skin.sysbtn_focusradio" src="PNG:ID_SYSBTN_FOCUS_RADIO"/>
+  <imglist name="_skin.sysbtn_check" src="PNG:ID_SYSBTN_CHECK" states="8"/>
+  <imglist name="_skin.sysbtn_focuscheck" src="PNG:ID_SYSBTN_FOCUS_CHECK"/>
   <imgframe name="_skin.border" src="PNG:ID_BORDER" states="2" margin-x="2" margin-y="1"/>
 	<imglist name="_skin.tab_main" src="PNG:ID_TAB_MAIN" states="3" />
 	<imglist name="_skin.tab_icon" src="PNG:ID_TAB_ICON" states="2" />
@@ -27,11 +29,13 @@
 
   <imglist name="btn.blue_little"	src="BTN:ID_BLUE_LITTLE_BTN" states="3"/>
   <imglist name="btn.blue_large"	src="BTN:ID_BLUE_LARGE_BTN" states="3"/>
-  <imglist name="btn.white"	src="BTN:ID_WHITE_BTN" states="4"/>
+  <imglist name="btn.blue_upright"	src="BTN:ID_BLUE_UPRIGHT_BTN" states="3"/>
+  <imglist name="btn.blue_upleft"	src="BTN:ID_BLUE_UPLEFT_BTN" states="3"/>
+  <imglist name="btn.white"	src="BTN:ID_WHITE_BTN" states="3"/>
   <imglist name="btn.back"	src="BTN:ID_BACK_BTN" states="4"/>
   <imglist name="btn.pre"	src="BTN:ID_PRE_BTN" states="4"/>
   <imglist name="btn.ref"	src="BTN:ID_REF_BTN" states="4"/>
-  <imglist name="btn.play"	src="BTN:ID_PLAY_BTN" states="3"/>
-  <imglist name="btn.sync"	src="BTN:ID_SYNC_BTN" states="3"/>
-  <imglist name="btn.format"	src="BTN:ID_FORMAT_BTN" states="3"/>
+  <imglist name="btn.white_left"	src="BTN:ID_WHITE_LEFT_BTN" states="3"/>
+  <imglist name="btn.white_middle"	src="BTN:ID_WHITE_MIDDLE_BTN" states="3"/>
+  <imglist name="btn.white_right"	src="BTN:ID_WHITE_RIGHT_BTN" states="3"/>
 </skin>

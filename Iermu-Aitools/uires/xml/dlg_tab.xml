@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<include width="920" height="540">
+<include>
 	<tabctrl2 name="tab_main" tabPos="236" tabAlign="top" colorText="#ffffff" pos="0,[0,-0,-0" show="1" curSel="0" focusable="0" tabHeight="78" tabSkin="_skin.tab_main" iconSkin="_skin.tab_icon" text-y="50" icon-x="35" tabInterSize="200">
 		<page2 title="摄像机设置" tip="摄像机设置" ani_in="skin.camera.hover" ani_out="skin.camera.leave">
       <tabctrl pos="0,[0,-0,-0" show="1" blackcurSel="0" focusable="0" animateSteps="10" animateType="1" tabSkin="_skin.page_main" tabAlign="left" text-x="10" tabWidth="200" tabHeight="60" colorBkgnd="@color/white" colorText="@color/black" colorTextHover="@color/blue" colorTextPush="@color/blue">
@@ -49,13 +49,13 @@
         <text pos="40, [20">图片接收服务器</text>
         <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
         <text pos="|-20,[10" size="120, 30" name="server_status" colorText="@color/red">服务已停止</text>
-        <imgbtn pos="|-160,[10" size="120, 30" name="start_server" skin="btn.blue_little">启动服务</imgbtn>
-        <imgbtn pos="|60,{0" size="120, 30" skin="btn.format" name="stop_server" >停止服务</imgbtn>
+        <imgbtn pos="|-160,[10" size="120, 30" skin="btn.blue_upright" colorText="@color/white" name="start_server" >启动服务</imgbtn>
+        <imgbtn pos="|60,{0" size="120, 30" skin="btn.white" name="stop_server" >停止服务</imgbtn>
         <text pos="40,[10">图片服务器设置</text>
         <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
         <!--text pos="|-260,[40" size="140, 30" align="right">图片接收服务器</text>
         <combobox name="cbx_autorun"  pos="[40,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-          <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+          <liststyle class="cls_box">
           </liststyle>
           <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
           <items>
@@ -66,14 +66,14 @@
                
         <text pos="|-260,[10" size="140, 30" align="right">存储路径</text>
         <edit name="edit_picture_path" pos="[40,{2" size="260,26" extend="2" class="cls_edit" cueText="C:\jpg"></edit>
-        <imgbtn name="btn_picture_path" pos="[10,{-4" size="60,30" skin="btn.blue_little" colorText="@color/white">选取路径</imgbtn>
+        <imgbtn name="btn_picture_path" pos="[10,{1" size="60,24" skin="btn.blue_upleft" colorText="@color/white">选取路径</imgbtn>
         
         <text pos="|-260,[10" size="140, 30" align="right">服务器的端口</text>
         <edit name="edit_server_port" number="1" pos="[40,{2" size="260,26" extend="2" class="cls_edit" cueText="端口号"></edit>     
         
         <text pos="|-260,[10" size="140, 30" align="right">启动后自动运行</text>
         <combobox name="cbx_autorun"  pos="[40,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-          <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+          <liststyle class="cls_box">
           </liststyle>
           <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
           <items>
@@ -83,7 +83,7 @@
         </combobox>
         <text pos="|-260,[10" size="140, 30" align="right">启动目录浏览</text>
         <combobox name="cbx_dirbrowse"  pos="[40,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-          <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+          <liststyle class="cls_box">
           </liststyle>
           <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
           <items>

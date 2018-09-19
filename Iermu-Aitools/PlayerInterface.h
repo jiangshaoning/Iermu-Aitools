@@ -16,6 +16,7 @@ public:
 	
 	void startPlay(const char* playurl);
 	int ffplayWithUrl(const char* playurl);
+	int ffplayWithUrlNoVoice(const char* playurl);
 	int ffplayStop();
 	void PlayerShowText(int time);
 	void OnRecordVideo();			//Â¼Ïñ

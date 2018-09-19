@@ -46,10 +46,7 @@ void CPlayerInterface::init(HWND parent)
 	memset(&m_Params, 0, sizeof(m_Params));
 	m_Params.adev_render_type = ADEV_RENDER_TYPE_WAVEOUT;
 	m_Params.vdev_render_type = VDEV_RENDER_TYPE_GDI;
-	m_Params.audio_stream_cur = -1;
-	m_Params.low_delay = 1;
 	m_Params.init_timeout = 10000;
-
 }
 
 void CPlayerInterface::startPlay(const char* playurl)
@@ -73,6 +70,18 @@ int CPlayerInterface::ffplayWithUrl(const char* playurl)
 {
 	ffplayStop();
 	init(NULL);
+	m_Params.audio_stream_cur = 0;
+	m_Params.low_delay = 0;
+	startPlay(playurl);
+	return 0;
+}
+
+int CPlayerInterface::ffplayWithUrlNoVoice(const char* playurl)
+{
+	ffplayStop();
+	init(NULL);
+	m_Params.audio_stream_cur = -1;
+	m_Params.low_delay = 1;
 	startPlay(playurl);
 	return 0;
 }

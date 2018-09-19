@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<include width="920" height="540">
+<include>
   <imgbtn name="btn_camerainfo_back" skin="btn.back" pos="10, 15"></imgbtn>
   <imgbtn name="btn_camerainfo_pre" skin="btn.pre" pos="[1, {0" ></imgbtn>
   <imgbtn name="btn_camerainfo_ref" skin="btn.ref" pos="[10, {0" ></imgbtn>

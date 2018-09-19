@@ -9,10 +9,10 @@
     <text pos="20, 20">NAS设置</text>
     <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
 
-    <text pos="|-200,[5" size="120,30" align="right">NAS</text>
-    <check name="check_switch_nas" pos="[20,{2" size="120,26" extend="2">启用</check>
-    <!--combobox name="cbx_switch_nas"  pos="[20,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-      <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+    <text pos="|-200,[5" size="120,22" align="right">NAS</text>
+    <check name="check_switch_nas" pos="[20,{0" size="120,22" class="cls_check">启用</check>
+    <!--combobox name="cbx_switch_nas"  pos="[20,{0" size="120,22" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+      <liststyle class="cls_box">
       </liststyle>
       <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
       <items>
@@ -21,19 +21,19 @@
       </items>
     </combobox-->
     
-    <text pos="|-200,[5" size="120,30" align="right">NAS的IP地址</text>
-    <edit name="edit_nas_ip" pos="[20,{2" size="260,26" extend="2" class="cls_edit"></edit>
+    <text pos="|-200,[5" size="120,22" align="right">NAS的IP地址</text>
+    <edit name="edit_nas_ip" pos="[20,{0" size="260,22" class="cls_edit"></edit>
     
-    <text pos="|-200,[5" size="120,30" align="right">NAS的用户名密码</text>
-    <edit name="edit_nas_user" pos="[20,{2" size="150,26" extend="2" class="cls_edit" cueText="用户名" readonly="0"></edit>
-    <edit name="edit_nas_passwd" pos="[10,{0" size="150,26" extend="2" class="cls_edit" cueText="密码" readonly="0"></edit>
-    <check name="check_nas_anonymous" pos="{-160,[5" size="150,26" btnskin="_skin.sysbtn_check">匿名</check>
+    <text pos="|-200,[5" size="120,22" align="right">NAS的用户名密码</text>
+    <edit name="edit_nas_user" pos="[20,{0" size="150,22" class="cls_edit" cueText="用户名" readonly="0"></edit>
+    <edit name="edit_nas_passwd" pos="[10,{0" size="150,22" class="cls_edit" cueText="密码" readonly="0"></edit>
+    <check name="check_nas_anonymous" pos="{-160,[5" size="150,22" class="cls_check">匿名</check>
     
-    <text pos="|-200,[5" size="120,30" align="right">NAS存储目录</text>
-    <edit name="edit_nas_path" pos="[20,{2" size="260,26" extend="2" class="cls_edit"></edit>
-    <text pos="|-200,[5" size="120,30" align="right">NAS分配空间</text>
-    <edit name="edit_nas_space" number="1" pos="[20,{2" size="120,26" extend="2" class="cls_edit"></edit>
-    <text pos="[10,{-2" size="40,30" align="left">G</text>
+    <text pos="|-200,[5" size="120,22" align="right">NAS存储目录</text>
+    <edit name="edit_nas_path" pos="[20,{0" size="260,22" class="cls_edit"></edit>
+    <text pos="|-200,[5" size="120,22" align="right">NAS分配空间</text>
+    <edit name="edit_nas_space" number="1" pos="[20,{0" size="120,22" class="cls_edit"></edit>
+    <text pos="[10,{0" size="40,22" align="left">G</text>
     
     <!--******************************NAS设置******************************-->
     
@@ -41,10 +41,10 @@
     <text pos="20, [10">SD卡设置</text>
     <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
 
-    <text pos="|-200,[5" size="120,30" align="right">SD卡</text>
-    <check name="check_switch_rec" pos="[20,{2" size="120,26" extend="2">启用</check>
-    <!--combobox name="cbx_lib"  pos="[20,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-      <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+    <text pos="|-200,[5" size="120,22" align="right">SD卡</text>
+    <check name="check_switch_rec" pos="[20,{0" size="120,22" class="cls_check" >启用</check>
+    <!--combobox name="cbx_lib"  pos="[20,{0" size="120,26" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+      <liststyle class="cls_box">
       </liststyle>
       <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
       <items>
@@ -52,9 +52,9 @@
         <item text=" 启用" />
       </items>
     </combobox-->
-    <text pos="|-200,[5" size="120,30" align="right">SD卡格式化</text>
-    <imgbtn pos="[20,{2" size="120,26" name="btn_format_sdcard" skin="btn.format" extend="2" colorText="@color/gray"  focusable="0" >点击格式化</imgbtn>
-    <text pos="[20,{2"  name="text_formate_progress" colorText="@color/red">0.0%</text>
+    <text pos="|-200,[5" size="120,22" align="right">SD卡格式化</text>
+    <imgbtn pos="[20,{0" size="120,22" name="btn_format_sdcard" skin="btn.blue_upright" colorText="@color/white"  focusable="0" >点击格式化</imgbtn>
+    <text pos="[20,{0"  name="text_formate_progress" colorText="@color/red" show="0">0.0%</text>
     <!--******************************SD卡设置******************************-->
 
     <!--******************************储存设置******************************-->
@@ -62,8 +62,8 @@
     <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
 
     <!--text pos="|-200,[5" size="120,30" align="right">本地录像</text>
-    <combobox name="cbx_switch_rec"  pos="[20,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-      <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+    <combobox name="cbx_switch_rec"  pos="[20,{0" size="120,22" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+      <liststyle class="cls_box">
       </liststyle>
       <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
       <items>
@@ -71,9 +71,9 @@
         <item text=" 开启" />
       </items>
     </combobox-->
-    <text pos="|-200,[5" size="120,30" align="right">录像类型</text>
-    <combobox name="cbx_type_rec"  pos="[20,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-      <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+    <text pos="|-200,[10" size="120,22" align="right">录像类型</text>
+    <combobox name="cbx_type_rec"  pos="[20,{0" size="120,22" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+      <liststyle class="cls_box">
       </liststyle>
       <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
       <items>
@@ -81,9 +81,9 @@
         <item text=" 事件录像" />
       </items>
     </combobox>
-    <text pos="|-200,[5" size="120,30" align="right">人脸图片本地存储</text>
-    <combobox name="cbx_switch_saveface"  pos="[20,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
-      <liststyle class="cls_box" itemSkin="_skin.tab_left" colorSelText="#FFFFFF" colorItemBkgnd="#0AB4FA" colorItemSelBkgnd="#000088" colorBkgnd="#ffffff">
+    <text pos="|-200,[8" size="120,22" align="right">人脸图片本地存储</text>
+    <combobox name="cbx_switch_saveface"  pos="[20,{0" size="120,22" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+      <liststyle class="cls_box">
       </liststyle>
       <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
       <items>
@@ -91,13 +91,12 @@
         <item text=" 开启" />
       </items>
     </combobox>
-    <text pos="|-200,[5" size="120,30" align="right">人脸图片存储空间</text>
-    <edit name="edit_jpgmem" pos="[20,{2" number="1" size="120,26" extend="2" class="cls_edit"></edit>
-    <text pos="[10,{-2" size="40,30" align="left">G</text>
+    <text pos="|-200,[8" size="120,22" align="right">人脸图片存储空间</text>
+    <edit name="edit_jpgmem" pos="[20,{0" number="1" size="120,22" class="cls_edit"></edit>
+    <text pos="[10,{0" size="40,22" align="left">G</text>
     <!--******************************储存设置******************************-->
 
     <imgbtn name="btn_camera_store" skin="btn.blue_little" pos="|0,[40" offset="-0.5,-0.5" align="center" colorText="@color/white">确定</imgbtn>
-    <text pos="{0,[0" size="10, 60"></text>
     
   </scrollview>
 </include> 
