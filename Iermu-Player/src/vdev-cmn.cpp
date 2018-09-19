@@ -105,6 +105,9 @@ void vdev_setparam(void *ctxt, int id, void *param)
     case PARAM_AVSYNC_TIME_DIFF:
         c->tickavdiff = *(int*)param;
         break;
+	case PARAM_PLAY_LOW_DELAY:
+		c->low_delay = *(int*)param;
+		break;
     }
     if (c->setparam) c->setparam(c, id, param);
 }
@@ -208,7 +211,8 @@ void vdev_avsync_and_complete(void *ctxt)
         scdiff  = (int)(sysclock - c->vpts - c->tickavdiff); // diff between system clock and video pts
         avdiff  = (int)(c->apts  - c->vpts - c->tickavdiff); // diff between audio and video pts
         avdiff  = c->apts <= 0 ? scdiff : avdiff; // if apts is invalid, sync video to system clock
-		avdiff = 501;
+		if (c->low_delay)
+			avdiff = 501; //Ð´ËÀ µÍÑÓ³ÙÖµ
         if (tickdiff - tickframe >  5) c->ticksleep--;
         if (tickdiff - tickframe < -5) c->ticksleep++;
         if (c->vpts >= 0) {

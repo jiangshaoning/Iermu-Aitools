@@ -104,7 +104,7 @@ static void render_setspeed(RENDER *render, int speed)
 
 // º¯ÊýÊµÏÖ
 void* render_open(int adevtype, int srate, AVSampleFormat sndfmt, int64_t ch_layout,
-                  int vdevtype, void *surface, AVRational frate, AVPixelFormat pixfmt, int w, int h)
+                  int vdevtype, void *surface, AVRational frate, AVPixelFormat pixfmt, int w, int h, int *delay)
 {
     RENDER *render = (RENDER*)calloc(1, sizeof(RENDER));
     if (!render) {
@@ -143,6 +143,7 @@ void* render_open(int adevtype, int srate, AVSampleFormat sndfmt, int64_t ch_lay
     render->adev = adev_create(adevtype, 0, (int)((double)ADEV_SAMPLE_RATE * frate.den / frate.num + 0.5) * 4);
     render->vdev = vdev_create(vdevtype, surface, 0, w, h, (int)((double)frate.num / frate.den + 0.5));
 
+	vdev_setparam(render->vdev, PARAM_PLAY_LOW_DELAY, delay);
     // make adev & vdev sync together
     int64_t *papts = NULL;
     vdev_getavpts(render->vdev, &papts, NULL);

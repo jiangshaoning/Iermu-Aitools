@@ -98,6 +98,9 @@ enum {
     PARAM_RENDER_GET_CONTEXT = 0x4000,
     PARAM_RENDER_STEPFORWARD,
     //-- for render
+
+	//low delay play
+	PARAM_PLAY_LOW_DELAY,
 };
 
 // 初始化参数说明
@@ -136,6 +139,7 @@ typedef struct {
     int  open_syncmode;            // w  播放器以同步方式打开，调用 player_open 将等待播放器初始化成功
     int  auto_reconnect;           // w  播放流媒体时自动重连的超时时间，毫秒为单位
 
+	int  low_delay;				   // r  低延迟播放 关闭音频流
     char filter_string[256];       // w  自定义的 video filter string
 } PLAYER_INIT_PARAMS;
 // video_stream_cur 和 audio_stream_cur 这两个参数，如果设置为 -1 可以禁止对应的解码动作

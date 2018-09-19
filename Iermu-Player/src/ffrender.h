@@ -13,7 +13,7 @@ extern "C" {
 
 // 函数声明
 void*render_open(int adevtype, int srate, AVSampleFormat sndfmt, int64_t ch_layout,
-                 int vdevtype, void *surface, AVRational frate, AVPixelFormat pixfmt, int w, int h);
+                 int vdevtype, void *surface, AVRational frate, AVPixelFormat pixfmt, int w, int h, int *delay);
 void render_close   (void *hrender);
 void render_audio   (void *hrender, AVFrame *audio);
 void render_video   (void *hrender, AVFrame *video);

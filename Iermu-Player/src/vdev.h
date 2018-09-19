@@ -62,6 +62,7 @@ extern "C" {
     TCHAR    *textt;                          \
     TCHAR     font_name[32];                  \
     int       font_size;                      \
+	int       low_delay;                      \
     void (*lock    )(void *ctxt, uint8_t *buffer[8], int linesize[8]); \
     void (*unlock  )(void *ctxt, int64_t pts);                         \
     void (*setrect )(void *ctxt, int x, int y, int w, int h);          \

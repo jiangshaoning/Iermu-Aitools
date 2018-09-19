@@ -378,7 +378,8 @@ static int player_prepare(PLAYER *player)
 
     // open input file
     
-	av_dict_set(&opts, "probesize", "2*1024", 0);
+	player->init_params.low_delay?
+		av_dict_set(&opts, "probesize", "2*1024", 0) : av_dict_set(&opts, "probesize", "200*1024", 0);
 	av_dict_set(&opts, "preset", "superfast", 0);
 	av_dict_set(&opts, "buff_size", "0", 0);
 	av_dict_set(&opts, "stimeout", "10000000", 0);
@@ -475,7 +476,7 @@ static int player_prepare(PLAYER *player)
     player->render = render_open(
         player->init_params.adev_render_type, arate, (AVSampleFormat)aformat, alayout,
         player->init_params.vdev_render_type, player->appdata, vrate, vformat,
-        player->init_params.video_owidth, player->init_params.video_oheight);
+		player->init_params.video_owidth, player->init_params.video_oheight, &(player->init_params.low_delay));
 
     if (player->vstream_index == -1) {
         int effect = VISUAL_EFFECT_WAVEFORM;
