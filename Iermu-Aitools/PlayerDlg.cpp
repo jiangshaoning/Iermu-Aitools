@@ -17,6 +17,7 @@ PlayerDlg::PlayerDlg() : SHostWnd(_T("LAYOUT:XML_PLAYERWND"))
 
 PlayerDlg::~PlayerDlg()
 {
+	RELEASEPLAYER(m_hplayer);
 }
 
 int PlayerDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -53,6 +54,7 @@ BOOL PlayerDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 //TODO:œ˚œ¢”≥…‰
 void PlayerDlg::OnClose()
 {
+	RELEASEPLAYER(m_hplayer);
 	CSimpleWnd::DestroyWindow();
 }
 

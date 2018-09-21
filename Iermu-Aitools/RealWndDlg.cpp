@@ -11,7 +11,6 @@ CRealWndDlg::CRealWndDlg():SHostDialog(_T("LAYOUT:XML_REALWND"))
 
 CRealWndDlg::~CRealWndDlg(void)
 {
-	RELEASEPLAYER(m_hplayer);
 }
 void CRealWndDlg::On_Menu_Open()
 {
