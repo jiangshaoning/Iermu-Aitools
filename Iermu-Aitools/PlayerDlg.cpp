@@ -10,6 +10,8 @@ PlayerDlg::PlayerDlg() : SHostWnd(_T("LAYOUT:XML_PLAYERWND"))
 	m_bLayoutInited = FALSE;
 	m_hplayer = NULL;
 	m_voiceType = 0;
+	m_bIsRecording = FALSE;
+	m_ctrl_down = FALSE;
 	memset(m_playUrl, 0, sizeof(m_playUrl));
 }
 
@@ -94,14 +96,32 @@ void PlayerDlg::OnSize(UINT nType, CSize size)
 
 }
 
+//Ω” ‹º¸≈Ã ‰»Î
+void PlayerDlg::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	switch (nChar)
+	{
+	case VK_CONTROL:
+		m_ctrl_down = TRUE;
+		break;
+	case 'R'://Ctrl + R
+		if (m_ctrl_down)
+		{
+			player_record(m_hplayer, m_bIsRecording ? NULL : "record.mp4");
+			m_bIsRecording = !m_bIsRecording;
+		}
+		break;
+	case 'S'://Ctrl + S
+		if (m_ctrl_down)
+		{
+			player_snapshot(m_hplayer, "snapshot.jpg", 0, 0, 1000);
+		}
+		break;
+	}
+}
+
 void PlayerDlg::SetPlayUrl(char *url, int voiceType)
 {
 	m_voiceType = voiceType;
 	strcpy(m_playUrl, url);
 }
-
-//LRESULT PlayerDlg::playVideo(UINT uMsg, WPARAM wParam, LPARAM lParam)
-//{
-//	player_play(m_hplayer);
-//	return 0;
-//}

@@ -17,9 +17,10 @@ public:
 	void OnMinimize();
 	void OnSize(UINT nType, CSize size);
 	int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	//接受键盘输入
+	void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 	void SetPlayUrl(char *url, int voiceType);
-	//LRESULT playVideo(UINT uMsg, WPARAM wParam, LPARAM lParam);
 protected:
 	//soui消息
 	EVENT_MAP_BEGIN()
@@ -35,7 +36,7 @@ protected:
 		MSG_WM_INITDIALOG(OnInitDialog)
 		MSG_WM_CLOSE(OnClose)
 		MSG_WM_SIZE(OnSize)
-		//MESSAGE_HANDLER_EX(MSG_FANPLAYER, playVideo)
+		MSG_WM_KEYDOWN(OnKeyDown)
 		CHAIN_MSG_MAP(SHostWnd)
 		REFLECT_NOTIFICATIONS_EX()
 		END_MSG_MAP()
@@ -45,4 +46,6 @@ private:
 	char			m_playUrl[60];		//播放路径
 	int				m_voiceType;		//是否有声音
 	RECT			m_rtClient;
+	BOOL			m_ctrl_down;
+	BOOL			m_bIsRecording;
 };

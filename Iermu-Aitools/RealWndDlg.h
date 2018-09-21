@@ -40,4 +40,6 @@ protected:
 private:
 	SMenuEx m_menu_open;
 	void*   m_hplayer;
+	BOOL	m_ctrl_down;
+	BOOL	m_bIsRecording;
 };

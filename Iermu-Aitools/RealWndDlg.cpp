@@ -5,6 +5,8 @@
 CRealWndDlg::CRealWndDlg():SHostDialog(_T("LAYOUT:XML_REALWND"))								
 {
 	m_menu_open.LoadMenu(_T("LAYOUT:menu_open"));
+	m_bIsRecording = FALSE;
+	m_ctrl_down = FALSE;
 }
 
 CRealWndDlg::~CRealWndDlg(void)
@@ -46,26 +48,42 @@ void CRealWndDlg::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (nChar)
 	{
+	case VK_CONTROL:
+		m_ctrl_down = TRUE;
+		break;
+	case 'R'://Ctrl + R
+		if (m_ctrl_down)
+		{
+			player_record(m_hplayer, m_bIsRecording ? NULL : "record.mp4");
+			m_bIsRecording = !m_bIsRecording;
+		}
+		break;
+	case 'S'://Ctrl + S
+		if (m_ctrl_down)
+		{
+			player_snapshot(m_hplayer, "snapshot.jpg", 0, 0, 1000);
+		}
+		break;
 	
-	case  VK_ESCAPE://退出全屏
-	{
-		::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)10);
-	}break;
-	case VK_SPACE://空格暂停
-	{
-		::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)11);
-	}
-	break;
-	case VK_LEFT:  //快退
-		{
-			::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)15);
-		}
-		break;
-	case VK_RIGHT://快进
-		{
-			::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)16);
-		}
-		break;
+	//case  VK_ESCAPE://退出全屏
+	//{
+	//	::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)10);
+	//}break;
+	//case VK_SPACE://空格暂停
+	//{
+	//	::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)11);
+	//}
+	//break;
+	//case VK_LEFT:  //快退
+	//	{
+	//		::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)15);
+	//	}
+	//	break;
+	//case VK_RIGHT://快进
+	//	{
+	//		::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)16);
+	//	}
+	//	break;
 	}
 }
 void CRealWndDlg::OnLbuttonDBLCLK(UINT nFlags, CPoint pt)
