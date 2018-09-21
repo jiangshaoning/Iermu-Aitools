@@ -21,5 +21,10 @@
     <page title="其他">
       <include src="layout:XML_OTHERPAGE"/>
     </page>
+    <page title="播放">
+      <window name="realplay_wnd" pos="0,0,-0,-0">
+        <realwnd pos="0,0,-0,-0" name="vlcwnd"  focusable="0" wndclass="CRealWndDlg" wndname="mainWindow" show="0"/>
+      </window>
+    </page>
   </tabctrl>     
 </include>

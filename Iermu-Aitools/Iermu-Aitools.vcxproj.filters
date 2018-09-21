@@ -107,6 +107,15 @@
     <ClCompile Include="STabCtrl2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RealWndDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SouiRealWndHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Iermu-Aitools.rc">
@@ -201,6 +210,15 @@
     <ClInclude Include="STabCtrl2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RealWndDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SouiRealWndHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\soui_res.rc2">
@@ -242,6 +260,12 @@
       <Filter>SoUI Resouece</Filter>
     </Xml>
     <Xml Include="uires\xml\dlg_cameraList.xml">
+      <Filter>SoUI Resouece</Filter>
+    </Xml>
+    <Xml Include="uires\xml\dlg_realwnd.xml">
+      <Filter>SoUI Resouece</Filter>
+    </Xml>
+    <Xml Include="uires\xml\dlg_player.xml">
       <Filter>SoUI Resouece</Filter>
     </Xml>
   </ItemGroup>

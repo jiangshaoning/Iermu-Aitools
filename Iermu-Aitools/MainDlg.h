@@ -6,6 +6,7 @@
 #include "WinSocketClient.h"
 #include "UpnpTool.h"
 #include "AdapterIP.h"
+#include "PlayerDlg.h"
 #include "PlayerInterface.h"
 
 struct UserInfo {
@@ -48,6 +49,7 @@ private:
 	BOOL BrowseDir(SStringT &path, HWND hwndOwner, SStringT title);
 	void SetPicturePath();
 	void SetServer();
+	void OnOpenPlay(int voiceType);
 	void OnPlay();
 	void OnPlayNoVoice();
 	void UpdateCameraInfo();
@@ -128,4 +130,5 @@ private:
 	SArray<CameraAddr>		m_iplist;			//摄像机列表id, ip, url
 	string					m_ConfFileName;		//配置文件路径
 	int						m_curSel;			//当前list选中行
+	PlayerDlg				m_dlgPlayer;
 };

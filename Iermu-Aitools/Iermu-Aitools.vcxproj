@@ -201,11 +201,14 @@
     <ClCompile Include="httpserver\src\XmlDocument.cpp" />
     <ClCompile Include="Iermu-Aitools.cpp" />
     <ClCompile Include="MainDlg.cpp" />
+    <ClCompile Include="PlayerDlg.cpp" />
     <ClCompile Include="PlayerInterface.cpp" />
+    <ClCompile Include="RealWndDlg.cpp" />
     <ClCompile Include="SAnimImg.cpp" />
     <ClCompile Include="socket\src\threadObject.cpp" />
     <ClCompile Include="socket\src\UpnpTool.cpp" />
     <ClCompile Include="socket\src\WinSocketClient.cpp" />
+    <ClCompile Include="SouiRealWndHandler.cpp" />
     <ClCompile Include="STabCtrl2.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -239,12 +242,15 @@
     <ClInclude Include="httpserver\include\WINFile.h" />
     <ClInclude Include="httpserver\include\XmlDocument.h" />
     <ClInclude Include="MainDlg.h" />
+    <ClInclude Include="PlayerDlg.h" />
     <ClInclude Include="PlayerInterface.h" />
+    <ClInclude Include="RealWndDlg.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SAnimImg.h" />
     <ClInclude Include="socket\include\threadObject.h" />
     <ClInclude Include="socket\include\UpnpTool.h" />
     <ClInclude Include="socket\include\WinSocketClient.h" />
+    <ClInclude Include="SouiRealWndHandler.h" />
     <ClInclude Include="STabCtrl2.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -280,6 +286,10 @@
       <SubType>Designer</SubType>
     </Xml>
     <Xml Include="uires\xml\dlg_main.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="uires\xml\dlg_player.xml" />
+    <Xml Include="uires\xml\dlg_realwnd.xml">
       <SubType>Designer</SubType>
     </Xml>
     <Xml Include="uires\xml\dlg_tab.xml">

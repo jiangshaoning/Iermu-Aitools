@@ -1,0 +1,17 @@
+﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="920" height="580"  minsize="920,580" margin="5,5,5,5"  resizable="1" wndType="normal" appWnd="1">
+  
+  <root skin="_skin.bg">
+    <caption pos="0,0,-0,40" show="1" font="adding:0">
+      <icon pos="5,0" src="ICON_LOGO:32"/>
+      <text pos="35,7" colorText="@color/white">@string/title</text>
+      <imgbtn name="btn_close" skin="_skin.sysbtn_close"    pos="-35,0" tip="close" animate="1"/>
+      <imgbtn name="btn_max" skin="_skin.sysbtn_max"  pos="-73,0" animate="1" />
+      <imgbtn name="btn_restore" skin="_skin.sysbtn_restore"  pos="-73,0" show="0" animate="1" />
+      <imgbtn name="btn_min" skin="_skin.sysbtn_min" pos="-111,0" animate="1" />
+    </caption>
+    <window name="realplay_wnd" pos="2,[0,-2,-2">
+      <realwnd pos="0,0,-0,-0" name="ffplaywnd"  focusable="0" wndclass="CRealWndDlg" wndname="mainWindow" />
+    </window>
+  </root>
+  
+</SOUI>

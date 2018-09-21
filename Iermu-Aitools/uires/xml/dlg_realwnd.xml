@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<SOUI width="-1" height="-1" resizable="1" wndType="normal" toolwindow="1" translucent="0">
+	<!--演示root大小自动计算,注意soui结点width,height的设置，哪一个值需要自动计算就设置为-1-->
+	<root size="-1,-1">
+	</root>
+</SOUI>

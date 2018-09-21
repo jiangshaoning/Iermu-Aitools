@@ -12,7 +12,6 @@ if (player) \
 }
 
 
-LRESULT CALLBACK WinMainProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM LParam);
 INT_PTR CALLBACK DlgProc(HWND hdlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
 CPlayerInterface::CPlayerInterface(): m_hplayer(NULL)

@@ -120,7 +120,8 @@ bool UpnpTool::upnpDiscover(int delay, string &localip, SArray<CameraAddr> &ipli
 			goto failed;
 		}
 	}
-	if (bind(sudp, (struct sockaddr*)&sockudp_r, sizeof(struct sockaddr_in)) != 0) {
+
+	if (0 != ::bind(sudp, (struct sockaddr*)&sockudp_r, sizeof(struct sockaddr_in))) {
 		goto failed;
 	}
 

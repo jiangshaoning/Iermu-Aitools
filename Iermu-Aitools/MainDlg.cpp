@@ -159,7 +159,6 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	InitServer();
 	SetLocalIPView();
 	InitSetEvent();
-
 	return 0;
 }
 //TODO:ÏûÏ¢Ó³Éä
@@ -1253,11 +1252,21 @@ void CMainDlg::RefreshCameraList()
 	GetCameraList();
 }
 
+void CMainDlg::OnOpenPlay(int voiceType)
+{
+	m_dlgPlayer.Create(m_hWnd);
+	m_dlgPlayer.SetPlayUrl(m_cinfo.cad.url, voiceType);
+	m_dlgPlayer.SendMessage(WM_INITDIALOG);
+	m_dlgPlayer.CenterWindow(m_dlgPlayer.m_hWnd);
+	m_dlgPlayer.ShowWindow(SW_NORMAL);
+}
+
 void CMainDlg::OnPlay()
 {
 	if (strlen(m_cinfo.cad.url) > 0 && m_cinfo.cad.url != NULL)
 	{
-		m_player.ffplayWithUrl(m_cinfo.cad.url);
+		OnOpenPlay(0);
+		//m_player.ffplayWithUrl(m_cinfo.cad.url);
 	}	
 	else
 	{
@@ -1269,7 +1278,8 @@ void CMainDlg::OnPlayNoVoice()
 {
 	if (strlen(m_cinfo.cad.url) > 0 && m_cinfo.cad.url != NULL)
 	{
-		m_player.ffplayWithUrlNoVoice(m_cinfo.cad.url);
+		OnOpenPlay(1);
+		//m_player.ffplayWithUrlNoVoice(m_cinfo.cad.url);
 	}
 	else
 	{
