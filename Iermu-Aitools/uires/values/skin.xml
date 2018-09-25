@@ -27,6 +27,11 @@
 	<imglist name="skin.camera.hover" src="PNG:ID_CAMERA_HOVER" states="10" />
 	<imglist name="skin.camera.leave" src="PNG:ID_CAMERA_LEAVE" states="10" />
 
+  <imglist name="skin.SliderBackVolume_png" src="PNG:ID_SLIDERBACKVOLUME" />
+  <imglist name="skin.SliderForeVolume_png" src="PNG:ID_SLIDERFOREVOLUME" />
+  <imglist name="skin.SliderPlayThumb_png" src="PNG:ID_SLIDERPLAYTHUMB" states="4" />
+  <imglist name="skin.SliderPlayvol_png" src="PNG:ID_SLIDERPLAYVOLUM" states="4" />
+  
   <imglist name="btn.blue_little"	src="BTN:ID_BLUE_LITTLE_BTN" states="3"/>
   <imglist name="btn.blue_large"	src="BTN:ID_BLUE_LARGE_BTN" states="3"/>
   <imglist name="btn.blue_upright"	src="BTN:ID_BLUE_UPRIGHT_BTN" states="3"/>
@@ -38,4 +43,11 @@
   <imglist name="btn.white_left"	src="BTN:ID_WHITE_LEFT_BTN" states="3"/>
   <imglist name="btn.white_middle"	src="BTN:ID_WHITE_MIDDLE_BTN" states="3"/>
   <imglist name="btn.white_right"	src="BTN:ID_WHITE_RIGHT_BTN" states="3"/>
+  <imglist name="btn.volume" src="BTN:ID_VOLUME_BTN" states="4" />
+  <imglist name="btn.volume_zero" src="BTN:ID_VOLUME_ZERO_BTN" states="4" />
+  <imglist name="btn.snapshot" src="BTN:ID_SNAPSHOT_BTN" states="3" />
+  <imglist name="btn.record" src="BTN:ID_RECORD_BTN" states="3" />
+  <imglist name="btn.refresh" src="BTN:ID_REFRESH_BTN" states="4" />
+  <imglist name="btn.screen_full" src="BTN:ID_SCREEN_FULL_BTN" states="4" />
+  <imglist name="btn.screen_normal" src="BTN:ID_SCREEN_NORMAL_BTN" states="4" />
 </skin>

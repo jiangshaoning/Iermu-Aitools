@@ -45,6 +45,10 @@
 		<file name="ID_CAMERA_LEAVE" path="image\camera_leave.png" />
     <file name="ID_LCEX_HEADER" path="image\lcex_header.png"/>
     <file name="ID_LCEX_HEADER_ARROW" path="image\lcex_header_arrow.png"/>
+    <file name="ID_SLIDERBACKVOLUME" path="image\SliderBackVolume.png" />
+    <file name="ID_SLIDERFOREVOLUME" path="image\SliderForeVolume.png" />
+    <file name="ID_SLIDERPLAYTHUMB" path="image\SliderPlayThumb.png" />
+    <file name="ID_SLIDERPLAYVOLUM" path="image\SliderPlayvolum.png" />
 	</PNG>
   <BTN>
     <file name="ID_BLUE_LITTLE_BTN" path="image\btn_blue_little.png"/>
@@ -58,6 +62,13 @@
     <file name="ID_WHITE_LEFT_BTN" path="image\btn_white_left.png"/>
     <file name="ID_WHITE_RIGHT_BTN" path="image\btn_white_right.png"/>
     <file name="ID_WHITE_MIDDLE_BTN" path="image\btn_white_midlle.png"/>
+    <file name="ID_VOLUME_BTN" path="image\btn_volume.png" />
+    <file name="ID_VOLUME_ZERO_BTN" path="image\btn_volume_zero.png" />
+    <file name="ID_SNAPSHOT_BTN" path="image\btn_snapshot.png" />
+    <file name="ID_RECORD_BTN" path="image\btn_record.png" />
+    <file name="ID_REFRESH_BTN" path="image\btn_refresh.png" />
+    <file name="ID_SCREEN_FULL_BTN" path="image\btn_screen_full.png" />
+    <file name="ID_SCREEN_NORMAL_BTN" path="image\btn_screen_normal.png" />
   </BTN>
   
 	<ICON>
