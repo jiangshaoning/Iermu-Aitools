@@ -49,7 +49,9 @@
     <edit name="edit_general_server" pos="|-160,310" size="260,22" class="cls_edit" cueText="服务器地址"></edit>
     <text pos="[5,{0">:</text>
     <edit name="edit_general_port" pos="[5,{0" size="60,22" class="cls_edit" cueText="端口号" align="center"></edit>
- 
+    <check name="check_general_https" class="cls_check" pos="[20, {2">支持https</check>
+    
+    
     <text pos="|-160,340" colorText="@color/red">若想将人脸抓拍存至本地图片接收服务器：</text>
     <link pos="|90,{-1" size="108,22" class="cls_btn_weblink" name="menu_btn_selip" show="1">请点击选取本机IP</link>
     <link pos="|90,{0" size="108,22" class="cls_btn_weblink" name="menu_btn_hideip" show="0">请点击隐藏IP菜单</link>

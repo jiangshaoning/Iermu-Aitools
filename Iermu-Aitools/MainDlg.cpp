@@ -34,6 +34,7 @@ protected:
 public:
 	CBVAdapterFix(SArray<UserInfo>  &ui)
 	{
+		m_userInfo.RemoveAll();
 		for (unsigned int i = 0; i < ui.GetCount(); i++)
 		{
 			m_userInfo.Add(ui.GetAt(i));
@@ -142,6 +143,9 @@ int CMainDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CMainDlg::InitSetEvent()
 {
+	SComboView *pComboView = FindChildByName2<SComboView>(L"cbv_account");
+	pComboView->GetEventSet()->subscribeEvent(EventCBDropdown::EventID, Subscriber(&CMainDlg::OnListenIPDropdownBox, this));
+
 	SCheckBox *check_nas_anonymous = FindChildByName2<SCheckBox>(L"check_nas_anonymous");
 	check_nas_anonymous->GetEventSet()->subscribeEvent(EventCmd::EventID, Subscriber(&CMainDlg::OnListenAnonymousCheckBox, this));
 
@@ -150,6 +154,7 @@ void CMainDlg::InitSetEvent()
 
 	SCheckBox *check_switch_rec = FindChildByName2<SCheckBox>(L"check_switch_rec");
 	check_switch_rec->GetEventSet()->subscribeEvent(EventCmd::EventID, Subscriber(&CMainDlg::OnListenRECSwitchCheckBox, this));
+
 }
 
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
@@ -157,7 +162,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	m_bLayoutInited = TRUE;
 	m_menushow = FALSE;
 	InitServer();
-	SetLocalIPView();
+	//SetLocalIPView();
 	InitSetEvent();
 	return 0;
 }
@@ -208,6 +213,7 @@ void CMainDlg::GoToCameraInfoPage()
 	STabCtrl *pTab = FindChildByName2<STabCtrl>(L"irm_main");
 	if (pTab)
 	{
+		SetLocalIPView();
 		UpdateCameraInfo();
 		pTab->SetCurSel(_T("camrainfo_page"));
 		SetDisplayProgress(L"camera_ip_win", L"camera_ip_progress");
@@ -302,16 +308,16 @@ int CMainDlg::GetLocalIPInfo(SArray<UserInfo> &Info)
 
 void CMainDlg::SetLocalIPView(void)
 {
-	GetLocalIPInfo(m_userInfo);
-	SComboView *pComboView = FindChildByName2<SComboView>(L"cbv_account");
-	if (pComboView)
-	{
-		SListView *pLstView = pComboView->GetListView();
-		CBVAdapterFix *pAdapter = new CBVAdapterFix(m_userInfo);
-		pLstView->SetAdapter(pAdapter);
-		pAdapter->Release();
-		pComboView->SetCurSel(-1);
-	}
+	//GetLocalIPInfo(m_userInfo);
+	//SComboView *pComboView = FindChildByName2<SComboView>(L"cbv_account");
+	//if (pComboView)
+	//{
+	//	SListView *pLstView = pComboView->GetListView();
+	//	CBVAdapterFix *pAdapter = new CBVAdapterFix(m_userInfo);
+	//	pLstView->SetAdapter(pAdapter);
+	//	pAdapter->Release();
+	//	pComboView->SetCurSel(-1);
+	//}
 
 	SListView *pLstLocalIP = FindChildByName2<SListView>("list_local_ip");
 	if (pLstLocalIP)
@@ -532,7 +538,6 @@ void CMainDlg::BackToTabpage()
 		}
 		else
 		{
-			SetLocalIPView();
 			pTab->SetCurSel(_T("tab_page"));
 		}
 		m_switchlist_tab = false;
@@ -548,6 +553,21 @@ void CMainDlg::SetCameraInfoPage(int pos)
 	memcpy(&m_cinfo, &m_cinfolist.GetAt(pos), sizeof(AICameraInfo));
 	SetCameraIP(m_cinfo.cad.cameraip);
 	GoToCameraInfoPage();
+}
+
+bool CMainDlg::OnListenIPDropdownBox(EventArgs *pEvtBase)
+{
+	GetLocalIPInfo(m_userInfo);
+	SComboView *pComboView = sobj_cast<SComboView>(pEvtBase->sender);
+	if (pComboView)
+	{
+		SListView *pLstView = pComboView->GetListView();
+		CBVAdapterFix* pAdapter = new CBVAdapterFix(m_userInfo);
+		pLstView->SetAdapter(pAdapter);				
+		pAdapter->Release();
+		pComboView->SetCurSel(-1);
+	}
+	return true;
 }
 
 //匿名checkbox监听
@@ -701,6 +721,8 @@ void CMainDlg::UpdateCameraInfo()
 	edit_general_server->SetWindowTextW(L"");
 	SEdit *edit_general_port = FindChildByName2<SEdit>(L"edit_general_port");
 	edit_general_port->SetWindowTextW(L"");
+	SCheckBox *check_general_https = FindChildByName2<SCheckBox>(L"check_general_https");
+	check_general_https->SetCheck(FALSE);
 	SEdit *edit_iermu_server = FindChildByName2<SEdit>(L"edit_iermu_server");
 	edit_iermu_server->SetWindowTextW(L"");
 	SEdit *edit_iermu_port = FindChildByName2<SEdit>(L"edit_iermu_port");
@@ -732,6 +754,8 @@ void CMainDlg::UpdateCameraInfo()
 		edit_general_server->SetWindowTextW(SStringT().Format(_T("%s"), S_CA2T((char *)m_cinfo.ipp.domain)));
 		(m_cinfo.ipp.port > 0 && m_cinfo.ipp.port <0xffff) ? edit_general_port->SetWindowTextW(SStringT().Format(_T("%d"), m_cinfo.ipp.port)) :
 			edit_general_port->SetWindowTextW(SStringT().Format(_T("80")));
+
+		check_general_https->SetCheck((m_cinfo.ipp.lib_type >> 7) & 1);
 	}
 
 	//图片上传服务器Iermu版
@@ -979,7 +1003,7 @@ bool CMainDlg::SetCameraServer()
 		if (sw_libname.length() > 0)
 			memcpy(m_cinfo.ipp.sw_id, sw_libname.c_str(), sw_libname.length());
 
-		m_cinfo.ipp.lib_type = FindChildByName2<SComboBox>(L"cbx_sw_lib")->GetCurSel() & 1;
+		m_cinfo.ipp.lib_type |= FindChildByName2<SComboBox>(L"cbx_sw_lib")->GetCurSel() & 1;
 	}
 
 
@@ -1009,6 +1033,9 @@ bool CMainDlg::SetCameraServer()
 			memcpy(m_cinfo.ipp.domain, general_server.c_str(), general_server.length());
 
 		m_cinfo.ipp.port = port;
+
+		SCheckBox *check_general_https = FindChildByName2<SCheckBox>(L"check_general_https");
+		m_cinfo.ipp.lib_type |= (check_general_https->IsChecked() ? (1 << 7) : 0);
 	}
 
 	//图片上传服务器Iermu版
@@ -1531,7 +1558,6 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 			{
 				SetDisplayProgress(L"cameralist_win", L"refresh_progress");
 				SetDisplayProgress(L"local_ip_win", L"local_ip_progress");
-				SetLocalIPView();
 				MessageBox(NULL, _T("没有获取到局域网的设备，\n请确保局域网内有AI摄像机"), _T("提示"), MB_OK | MB_ICONERROR);
 				return false;
 			}

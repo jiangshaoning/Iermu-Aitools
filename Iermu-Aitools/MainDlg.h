@@ -61,6 +61,7 @@ private:
 	void OnMenuHideLocalIP();
 	void OnMenuLoadLocalPort();
 	bool OnFormatSDcard();
+	bool OnListenIPDropdownBox(EventArgs *pEvtBase);
 	bool OnListenAnonymousCheckBox(EventArgs *pEvtBase);
 	bool OnListenNASSwitchCheckBox(EventArgs *pEvtBase);
 	bool OnListenRECSwitchCheckBox(EventArgs *pEvtBase);
