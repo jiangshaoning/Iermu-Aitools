@@ -12,6 +12,10 @@ PlayerDlg::PlayerDlg() : SHostWnd(_T("LAYOUT:XML_PLAYERWND"))
 	m_voiceType = 0;
 	m_bIsRecording = FALSE;
 	m_ctrl_down = FALSE;
+	m_LButtonDown = 0;
+	m_bFullScreenMode = FALSE;
+	m_captionHeight = 40;
+	m_toolsHeight = 50;
 	memset(m_playUrl, 0, sizeof(m_playUrl));
 }
 
@@ -49,6 +53,14 @@ BOOL PlayerDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
 		::SendMessageW(PlayHwnd, MS_OPENVIDEO_REALWND, 0, (LPARAM)(void *)m_hplayer);
 	}
+
+	m_VolumeSlider = FindChildByName2<SSliderBar>(L"volumeSlider");
+	if (m_VolumeSlider)
+	{
+		int volume = m_VolumeSlider->GetValue();
+		//m_VolumeSlider->SetRange(-182, 73);
+		player_setparam(m_hplayer, PARAM_AUDIO_VOLUME, (void*)&volume);
+	}
 	return 0;
 }
 //TODO:消息映射
@@ -82,8 +94,8 @@ void PlayerDlg::OnSize(UINT nType, CSize size)
 
 	if (nType != SIZE_MINIMIZED) {
 		m_rtClient = GetClientRect();
-		player_setrect(m_hplayer, 0, 0, 0, size.cx, size.cy - 2);
-		player_setrect(m_hplayer, 1, 0, 0, size.cx, size.cy - 2);
+		player_setrect(m_hplayer, 0, 2, 0, size.cx - 4, size.cy - m_captionHeight - m_toolsHeight);
+		player_setrect(m_hplayer, 1, 2, 0, size.cx - 4, size.cy - m_captionHeight - m_toolsHeight);
 	}
 	if (nType == SIZE_MAXIMIZED)
 	{
@@ -103,6 +115,9 @@ void PlayerDlg::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (nChar)
 	{
+	case VK_ESCAPE:
+		FullScreen(FALSE);
+		break;
 	case VK_CONTROL:
 		m_ctrl_down = TRUE;
 		break;
@@ -126,4 +141,109 @@ void PlayerDlg::SetPlayUrl(char *url, int voiceType)
 {
 	m_voiceType = voiceType;
 	strcpy(m_playUrl, url);
+}
+
+void PlayerDlg::OnRecord()
+{
+	player_record(m_hplayer, m_bIsRecording ? NULL : "record.mp4");
+	m_bIsRecording = !m_bIsRecording;
+}
+
+void PlayerDlg::OnSnapshot()
+{
+	player_snapshot(m_hplayer, "snapshot.jpg", 0, 0, 1000);
+}
+
+void PlayerDlg::OnVolume()
+{
+	int volume = -182;
+	FindChildByName2<SWindow>(L"btn_volume")->SetVisible(FALSE, TRUE);
+	FindChildByName2<SWindow>(L"btn_volume_zero")->SetVisible(TRUE, TRUE);
+	player_setparam(m_hplayer, PARAM_AUDIO_VOLUME, (void*)&volume);
+}
+
+void PlayerDlg::OnVolumeZero()
+{
+	int volume = m_VolumeSlider->GetValue();
+	FindChildByName2<SWindow>(L"btn_volume")->SetVisible(TRUE, TRUE);
+	FindChildByName2<SWindow>(L"btn_volume_zero")->SetVisible(FALSE, TRUE);
+	player_setparam(m_hplayer, PARAM_AUDIO_VOLUME, (void*)&volume);
+}
+
+
+void PlayerDlg::FullScreen(BOOL bFull)
+{
+	int iBorderX = GetSystemMetrics(SM_CXFIXEDFRAME) + GetSystemMetrics(SM_CXBORDER);
+	int iBorderY = GetSystemMetrics(SM_CYFIXEDFRAME) + GetSystemMetrics(SM_CYBORDER);
+	m_bFullScreenMode = bFull;
+
+	if (bFull)
+	{
+		m_captionHeight = 0;
+		m_toolsHeight = 0;
+		::GetWindowPlacement(m_hWnd, &m_OldWndPlacement);
+
+		if (::IsZoomed(m_hWnd))
+		{
+			::ShowWindow(m_hWnd, SW_SHOWDEFAULT);
+		}
+
+		::SetWindowPos(m_hWnd, HWND_TOPMOST, -iBorderX, -iBorderY, GetSystemMetrics(SM_CXSCREEN) + 2 * iBorderX, GetSystemMetrics(SM_CYSCREEN) + 2 * iBorderY, 0);
+		SCaption  *cap = FindChildByID2<SCaption>(6000);
+		cap->SetVisible(FALSE, TRUE);
+		cap = FindChildByID2<SCaption>(7000);
+		cap->SetVisible(FALSE, TRUE);
+
+	}
+	else
+	{
+		m_captionHeight = 40;
+		m_toolsHeight = 50;
+		::SetWindowPlacement(m_hWnd, &m_OldWndPlacement);
+		::SetWindowPos(m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		SCaption  *cap = FindChildByID2<SCaption>(6000);
+		cap->SetVisible(TRUE, TRUE);
+
+		cap = FindChildByID2<SCaption>(7000);
+		cap->SetVisible(TRUE, TRUE);
+	}
+}
+
+void PlayerDlg::OnScreenFull()
+{
+	if (!m_bFullScreenMode)
+		FullScreen(true);
+}
+
+void PlayerDlg::OnLButtonUp(UINT nFlags, CPoint pt)//处理进度条鼠标事件 播放指定位置 此处没有用EventSliderPos事件
+{
+	m_LButtonDown = 0;
+	SetMsgHandled(false);
+}
+
+//-182, 73
+void PlayerDlg::OnMouseMove(UINT nFlags, CPoint pt)
+{
+	if (m_VolumeSlider->GetWindowRect().PtInRect(pt) && m_LButtonDown == 1 && !m_voiceType)
+	{
+		int volume = m_VolumeSlider->GetValue();
+		switch (volume)
+		{
+		case -182:
+			OnVolume();
+			break;
+		default:
+			OnVolumeZero();
+			break;
+		}
+	}
+	SetMsgHandled(false);
+}
+
+void PlayerDlg::OnLButtonDown(UINT nFlags, CPoint pt)//处理进度条鼠标事件
+{
+	if (m_VolumeSlider->GetWindowRect().PtInRect(pt) && !m_voiceType)//处理音量
+		m_LButtonDown = 1;
+	SetMsgHandled(false);
+
 }
