@@ -12,7 +12,7 @@
   <imglist name="_skin.sysbtn_focuscheck" src="PNG:ID_SYSBTN_FOCUS_CHECK"/>
   <imgframe name="_skin.border" src="PNG:ID_BORDER" states="2" margin-x="2" margin-y="1"/>
 	<imglist name="_skin.tab_main" src="PNG:ID_TAB_MAIN" states="3" />
-	<imglist name="_skin.tab_icon" src="PNG:ID_TAB_ICON" states="2" />
+	<imglist name="_skin.tab_icon" src="PNG:ID_TAB_ICON" states="3" />
   <imglist name="_skin.page_main" src="PNG:ID_PAGE_MAIN" states="3"/>
 	<imglist name="_skin.white_bg" src="PNG:ID_WHITE_BG" alpha="255" />
   <imgframe name="_skin.tab_left" src="PNG:ID_TAB_LEFT" states="3" margin="1,1,1,1" />
@@ -47,6 +47,7 @@
   <imglist name="btn.volume_zero" src="BTN:ID_VOLUME_ZERO_BTN" states="4" />
   <imglist name="btn.snapshot" src="BTN:ID_SNAPSHOT_BTN" states="3" />
   <imglist name="btn.record" src="BTN:ID_RECORD_BTN" states="3" />
+  <imglist name="btn.record_stop" src="BTN:ID_RECORD_STOP_BTN" states="3" />
   <imglist name="btn.refresh" src="BTN:ID_REFRESH_BTN" states="4" />
   <imglist name="btn.screen_full" src="BTN:ID_SCREEN_FULL_BTN" states="4" />
   <imglist name="btn.screen_normal" src="BTN:ID_SCREEN_NORMAL_BTN" states="4" />

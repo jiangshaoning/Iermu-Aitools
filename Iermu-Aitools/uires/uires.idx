@@ -66,6 +66,7 @@
     <file name="ID_VOLUME_ZERO_BTN" path="image\btn_volume_zero.png" />
     <file name="ID_SNAPSHOT_BTN" path="image\btn_snapshot.png" />
     <file name="ID_RECORD_BTN" path="image\btn_record.png" />
+    <file name="ID_RECORD_STOP_BTN" path="image\btn_record_stop.png" />
     <file name="ID_REFRESH_BTN" path="image\btn_refresh.png" />
     <file name="ID_SCREEN_FULL_BTN" path="image\btn_screen_full.png" />
     <file name="ID_SCREEN_NORMAL_BTN" path="image\btn_screen_normal.png" />

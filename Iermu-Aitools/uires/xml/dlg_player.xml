@@ -13,12 +13,13 @@
       <realwnd pos="2,[0,-2,-50" name="ffplaywnd"  focusable="0" wndclass="CRealWndDlg" wndname="mainWindow" />
     <!--/window-->
     <caption id="7000" pos="0,-50,-0,-2" show="1" display="0">
-      <imgbtn name="btn_record" pos="40,13" size="30,30" cursor="hand"  tip="录屏" animate="1" skin="btn.record" />
-      <imgbtn name="btn_snapshot" pos="[30,13" size="30,30" cursor="hand"  tip="抓拍" animate="1" skin="btn.snapshot" />
+      <imgbtn name="btn_record" pos="40,13" size="36,30" cursor="hand"  tip="录屏" animate="1" skin="btn.record" />
+      <imgbtn name="btn_record_stop" pos="40,13" size="36,30" cursor="hand"  tip="停止" animate="1" show="0" skin="btn.record_stop" />
+      <imgbtn name="btn_snapshot" pos="[30,13" size="36,30" cursor="hand"  tip="抓拍" animate="1" skin="btn.snapshot" />
       <imgbtn name="btn_volume" data="1" id="206" pos="|-60,16" cursor="hand" size="16,16" tip="静音" animate="1" skin="btn.volume" />
       <imgbtn name="btn_volume_zero" data="1" id="206" pos="|-60,16" cursor="hand" size="16,16" tip="音量" animate="1" skin="btn.volume_zero" show="0"/>
       <sliderbar name="volumeSlider" thumbInRail="0" cursor="hand" width="100" value="50" min="-182" max="73" pos="[0,15" thumbSkin="skin.SliderPlayvol_png" posSkin="skin.SliderForeVolume_png" bkgndSkin="skin.SliderBackVolume_png"  />
-      <imgbtn name="btn_screen_full" pos="-40,15" size="24,18" cursor="hand" tip="全屏" animate="1" skin="btn.screen_full" />
+      <imgbtn name="btn_screen_full" pos="-40,15" size="33,25" cursor="hand" tip="全屏" animate="1" skin="btn.screen_full" />
     </caption> 
   </root>
   

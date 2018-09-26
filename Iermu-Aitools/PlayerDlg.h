@@ -28,6 +28,7 @@ public:
 	void SetPlayUrl(char *url, int voiceType);
 	void GetCurTimeName(char* Ctime, wchar_t* Wtime, char* name, char* postfix);
 	void OnRecord();
+	void OnRecordStop();
 	void OnSnapshot();
 	void OnVolume();
 	void OnVolumeZero();
@@ -44,6 +45,7 @@ public:
 		EVENT_NAME_COMMAND(L"btn_max", OnMaximize)
 		EVENT_NAME_COMMAND(L"btn_restore", OnRestore)
 		EVENT_NAME_COMMAND(L"btn_record", OnRecord)
+		EVENT_NAME_COMMAND(L"btn_record_stop", OnRecordStop)
 		EVENT_NAME_COMMAND(L"btn_snapshot", OnSnapshot)
 		EVENT_NAME_COMMAND(L"btn_volume", OnVolume)
 		EVENT_NAME_COMMAND(L"btn_volume_zero", OnVolumeZero)
