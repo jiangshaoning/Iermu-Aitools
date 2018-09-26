@@ -38,8 +38,7 @@ protected:
         REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 private:
-	SMenuEx m_menu_open;
-	void*   m_hplayer;
-	BOOL	m_ctrl_down;
-	BOOL	m_bIsRecording;
+	SMenuEx			m_menu_open;
+	PlayerDlg*		m_dlgplayer;
+	BOOL			m_ctrl_down;
 };

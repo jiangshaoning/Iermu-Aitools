@@ -11,6 +11,9 @@ public:
 	PlayerDlg();
 	~PlayerDlg();
 
+	void*			m_hplayer;
+	BOOL            m_bFullScreenMode;  // 是否在全屏模式
+
 	void OnClose();
 	void OnMaximize();
 	void OnRestore();
@@ -23,6 +26,7 @@ public:
 	void OnTimer(UINT_PTR nIDEvent);
 	void PlayerShowText(int time);
 	void SetPlayUrl(char *url, int voiceType);
+	void GetCurTimeName(char* Ctime, wchar_t* Wtime, char* name, char* postfix);
 	void OnRecord();
 	void OnSnapshot();
 	void OnVolume();
@@ -62,7 +66,6 @@ public:
 		END_MSG_MAP()
 private:
 	BOOL			m_bLayoutInited;
-	void*			m_hplayer;
 	char			m_playUrl[60];		//播放路径
 	int				m_voiceType;		//是否有声音
 	RECT			m_rtClient;
@@ -71,7 +74,6 @@ private:
 	SSliderBar*		m_VolumeSlider;
 	int				m_LButtonDown;
 	WINDOWPLACEMENT m_OldWndPlacement;  // 保存窗口原来的位置
-	BOOL            m_bFullScreenMode;  // 是否在全屏模式
 	int				m_captionHeight;	// 上面title高度
 	int				m_toolsHeight;		// 下面tools高度
 	TCHAR			m_strTxt[MAX_PATH];

@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "PlayerDlg.h"	
-
+#include <time.h>
 
 #define TIMER_ID_HIDE_TEXT     3
 
@@ -54,7 +54,7 @@ BOOL PlayerDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		}
 		m_hplayer = player_open((char *)m_playUrl, PlayHwnd, &Params);
 
-		::SendMessageW(PlayHwnd, MS_OPENVIDEO_REALWND, 0, (LPARAM)(void *)m_hplayer);
+		::SendMessageW(PlayHwnd, MS_OPENVIDEO_REALWND, 0, (LPARAM)(void *)this);
 	}
 
 	m_VolumeSlider = FindChildByName2<SSliderBar>(L"volumeSlider");
@@ -127,14 +127,13 @@ void PlayerDlg::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	case 'R'://Ctrl + R
 		if (m_ctrl_down)
 		{
-			player_record(m_hplayer, m_bIsRecording ? NULL : "record.mp4");
-			m_bIsRecording = !m_bIsRecording;
+			OnRecord();
 		}
 		break;
 	case 'S'://Ctrl + S
 		if (m_ctrl_down)
 		{
-			player_snapshot(m_hplayer, "snapshot.jpg", 0, 0, 1000);
+			OnSnapshot();
 		}
 		break;
 	}
@@ -164,19 +163,41 @@ void PlayerDlg::SetPlayUrl(char *url, int voiceType)
 	strcpy(m_playUrl, url);
 }
 
+void PlayerDlg::GetCurTimeName(char* Ctime, wchar_t* Wtime, char* name, char* postfix)
+{
+	time_t curtime = time(NULL);
+	tm *ptm = localtime(&curtime);
+
+	sprintf(Ctime, "%s_%d%02d%02d%02d%02d%02d.%s", name, ptm->tm_year + 1900, ptm->tm_mon + 1,
+		ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec, postfix);
+
+	MultiByteToWideChar(CP_ACP, 0, Ctime, -1, Wtime, 40);
+
+}
+
 void PlayerDlg::OnRecord()
 {
-	player_record(m_hplayer, m_bIsRecording ? NULL : "record.mp4");
+	if (!m_hplayer) return;
+
+	char ctime[40] = { 0 };
+	wchar_t wtime[48] = {0};
+	GetCurTimeName(ctime, wtime, "record", "mp4");
+	player_record(m_hplayer, m_bIsRecording ? NULL : ctime);
 	m_bIsRecording = !m_bIsRecording;
-	_stprintf(m_strTxt, TEXT("%s: record.mp4"), m_bIsRecording ? TEXT("开始录屏") : TEXT("结束录屏 保存到当前路径"));
-	PlayerShowText(2000);
+	_stprintf(m_strTxt, _T("%s: %s"), m_bIsRecording ? _T("开始录屏") : _T("结束录屏 保存到当前路径"), wtime);
+	PlayerShowText(3000);
 }
 
 void PlayerDlg::OnSnapshot()
 {
-	player_snapshot(m_hplayer, "snapshot.jpg", 0, 0, 1000);
-	_tcscpy(m_strTxt, TEXT("抓拍到当前路径：snapshot.jpg"));
-	PlayerShowText(2000);
+	if (!m_hplayer) return;
+
+	char ctime[40] = { 0 };
+	wchar_t wtime[48] = { 0 };
+	GetCurTimeName(ctime, wtime, "snapshot", "jpg");
+	player_snapshot(m_hplayer, ctime, 0, 0, 1000);
+	_stprintf(m_strTxt, _T("抓拍到当前路径：%s"), wtime);
+	PlayerShowText(3000);
 }
 
 void PlayerDlg::OnVolume()

@@ -5,7 +5,6 @@
 CRealWndDlg::CRealWndDlg():SHostDialog(_T("LAYOUT:XML_REALWND"))								
 {
 	m_menu_open.LoadMenu(_T("LAYOUT:menu_open"));
-	m_bIsRecording = FALSE;
 	m_ctrl_down = FALSE;
 }
 
@@ -25,7 +24,6 @@ void CRealWndDlg::On_Menu_Open()
 }
 void CRealWndDlg::On_Open_Files()
 {
-	
 	::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)1);
 }
 void CRealWndDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
@@ -36,10 +34,7 @@ void CRealWndDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 		if (nID == 2000)
 		{
 			::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)2);
-		}
-		
-		
-		
+		}		
 	}
 }
 // ¼üÅÌÏûÏ¢
@@ -47,77 +42,60 @@ void CRealWndDlg::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (nChar)
 	{
+	case VK_ESCAPE:
+		m_dlgplayer->FullScreen(FALSE);
+		break;
 	case VK_CONTROL:
 		m_ctrl_down = TRUE;
 		break;
 	case 'R'://Ctrl + R
 		if (m_ctrl_down)
 		{
-			player_record(m_hplayer, m_bIsRecording ? NULL : "record.mp4");
-			m_bIsRecording = !m_bIsRecording;
+			m_dlgplayer->OnRecord();
 		}
 		break;
 	case 'S'://Ctrl + S
 		if (m_ctrl_down)
 		{
-			player_snapshot(m_hplayer, "snapshot.jpg", 0, 0, 1000);
+			m_dlgplayer->OnSnapshot();
 		}
 		break;
-	
-	//case  VK_ESCAPE://ÍË³öÈ«ÆÁ
-	//{
-	//	::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)10);
-	//}break;
-	//case VK_SPACE://¿Õ¸ñÔİÍ£
-	//{
-	//	::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)11);
-	//}
-	//break;
-	//case VK_LEFT:  //¿ìÍË
-	//	{
-	//		::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)15);
-	//	}
-	//	break;
-	//case VK_RIGHT://¿ì½ø
-	//	{
-	//		::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)16);
-	//	}
-	//	break;
 	}
 }
-void CRealWndDlg::OnLbuttonDBLCLK(UINT nFlags, CPoint pt)
-{
-		
-	if (GetWindowRect().PtInRect(pt))//Ë«»÷È«ÆÁ/ÍË³ö
-		::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)12);
-	SetMsgHandled(false);
 
+void CRealWndDlg::OnLbuttonDBLCLK(UINT nFlags, CPoint pt)
+{	
+	//Ë«»÷È«ÆÁ/ÍË³ö
+	m_dlgplayer->m_bFullScreenMode ? m_dlgplayer->FullScreen(FALSE) : m_dlgplayer->FullScreen(TRUE);
+	
+	SetMsgHandled(false);
 }
+
 void CRealWndDlg::OnLbuttonup(UINT nFlags, CPoint pt)
 {
 
-	if (GetWindowRect().PtInRect(pt))//µ¥»÷²¥·Å/ÔİÍ£
-		::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)14);
+	//if (GetWindowRect().PtInRect(pt))//µ¥»÷²¥·Å/ÔİÍ£
+	//	::SendMessageW(SApplication::getSingleton().GetMainWnd(), MS_REALWND, 0, (LPARAM)(int)14);
 	SetMsgHandled(false);
 
 }
 
 LRESULT CRealWndDlg::openVideo(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	m_hplayer = (void*)lParam;
+	m_dlgplayer = (PlayerDlg*)lParam;
 	return 0;
 }
 
 LRESULT CRealWndDlg::closeVideo(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	RELEASEPLAYER(m_hplayer);
+	RELEASEPLAYER(m_dlgplayer->m_hplayer);
 	
 	return 0;
 }
 
 LRESULT CRealWndDlg::playVideo(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	player_play(m_hplayer);
+	player_play(m_dlgplayer->m_hplayer);
 	return 0;
 }
 
