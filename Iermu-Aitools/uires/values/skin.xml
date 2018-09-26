@@ -26,7 +26,18 @@
 	<imglist name="skin.server.leave" src="PNG:ID_SERVER_LEAVE" states="10" />
 	<imglist name="skin.camera.hover" src="PNG:ID_CAMERA_HOVER" states="10" />
 	<imglist name="skin.camera.leave" src="PNG:ID_CAMERA_LEAVE" states="10" />
+  <imglist name="skin.add.hover" src="PNG:ID_ADD_HOVER" states="10" />
+  <imglist name="skin.add.leave" src="PNG:ID_ADD_LEAVE" states="10" />
 
+  <imglist name="skin.step1" src="PNG:ID_STEP1"/>
+  <imglist name="skin.step2" src="PNG:ID_STEP2"/>
+  <imglist name="skin.step3" src="PNG:ID_STEP3"/>
+  <imglist name="skin.step4" src="PNG:ID_STEP4"/>
+  <imglist name="skin.current_step1" src="PNG:ID_CURRENT_STEP1"/>
+  <imglist name="skin.current_step2" src="PNG:ID_CURRENT_STEP2"/>
+  <imglist name="skin.current_step3" src="PNG:ID_CURRENT_STEP3"/>
+  <imglist name="skin.current_step4" src="PNG:ID_CURRENT_STEP4"/>
+  
   <imglist name="skin.SliderBackVolume_png" src="PNG:ID_SLIDERBACKVOLUME" />
   <imglist name="skin.SliderForeVolume_png" src="PNG:ID_SLIDERFOREVOLUME" />
   <imglist name="skin.SliderPlayThumb_png" src="PNG:ID_SLIDERPLAYTHUMB" states="4" />

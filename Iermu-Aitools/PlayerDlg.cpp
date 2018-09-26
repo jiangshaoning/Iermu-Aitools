@@ -184,6 +184,17 @@ void PlayerDlg::OnRecord()
 	GetCurTimeName(ctime, wtime, "record", "mp4");
 	player_record(m_hplayer, m_bIsRecording ? NULL : ctime);
 	m_bIsRecording = !m_bIsRecording;
+	if (m_bIsRecording)
+	{
+		FindChildByName2<SWindow>(L"btn_record")->SetVisible(FALSE, TRUE);
+		FindChildByName2<SWindow>(L"btn_record_stop")->SetVisible(TRUE, TRUE);
+	}
+	else
+	{
+		FindChildByName2<SWindow>(L"btn_record")->SetVisible(TRUE, TRUE);
+		FindChildByName2<SWindow>(L"btn_record_stop")->SetVisible(FALSE, TRUE);
+	}
+
 	_stprintf(m_strTxt, _T("%s: %s"), m_bIsRecording ? _T("开始录屏") : _T("结束录屏 保存到当前路径"), wtime);
 	PlayerShowText(3000);
 }

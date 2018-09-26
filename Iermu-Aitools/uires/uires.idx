@@ -43,12 +43,22 @@
 		<file name="ID_SERVER_LEAVE" path="image\server_leave.png" />
 		<file name="ID_CAMERA_HOVER" path="image\camera_hover.png" />
 		<file name="ID_CAMERA_LEAVE" path="image\camera_leave.png" />
+    <file name="ID_ADD_HOVER" path="image\add_hover.png"/>
+		<file name="ID_ADD_LEAVE" path="image\add_leave.png"/>
     <file name="ID_LCEX_HEADER" path="image\lcex_header.png"/>
     <file name="ID_LCEX_HEADER_ARROW" path="image\lcex_header_arrow.png"/>
-    <file name="ID_SLIDERBACKVOLUME" path="image\SliderBackVolume.png" />
-    <file name="ID_SLIDERFOREVOLUME" path="image\SliderForeVolume.png" />
-    <file name="ID_SLIDERPLAYTHUMB" path="image\SliderPlayThumb.png" />
-    <file name="ID_SLIDERPLAYVOLUM" path="image\SliderPlayvolum.png" />
+    <file name="ID_SLIDERBACKVOLUME" path="image\SliderBackVolume.png"/>
+    <file name="ID_SLIDERFOREVOLUME" path="image\SliderForeVolume.png"/>
+    <file name="ID_SLIDERPLAYTHUMB" path="image\SliderPlayThumb.png"/>
+    <file name="ID_SLIDERPLAYVOLUM" path="image\SliderPlayvolum.png"/>
+    <file name="ID_STEP1" path="image\step1.png"/>
+    <file name="ID_STEP2" path="image\step2.png"/>
+    <file name="ID_STEP3" path="image\step3.png"/>
+    <file name="ID_STEP4" path="image\step4.png"/>
+    <file name="ID_CURRENT_STEP1" path="image\current_step1.png"/>
+    <file name="ID_CURRENT_STEP2" path="image\current_step2.png"/>
+    <file name="ID_CURRENT_STEP3" path="image\current_step3.png"/>
+    <file name="ID_CURRENT_STEP4" path="image\current_step4.png"/>
 	</PNG>
   <BTN>
     <file name="ID_BLUE_LITTLE_BTN" path="image\btn_blue_little.png"/>
