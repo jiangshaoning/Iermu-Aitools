@@ -20,6 +20,8 @@ public:
 	//接受键盘输入
 	void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
+	void OnTimer(UINT_PTR nIDEvent);
+	void PlayerShowText(int time);
 	void SetPlayUrl(char *url, int voiceType);
 	void OnRecord();
 	void OnSnapshot();
@@ -50,6 +52,7 @@ public:
 		MSG_WM_INITDIALOG(OnInitDialog)
 		MSG_WM_CLOSE(OnClose)
 		MSG_WM_SIZE(OnSize)
+		MSG_WM_TIMER(OnTimer)
 		MSG_WM_LBUTTONDOWN(OnLButtonDown)
 		MSG_WM_LBUTTONUP(OnLButtonUp)
 		MSG_WM_MOUSEMOVE(OnMouseMove)
@@ -71,4 +74,5 @@ private:
 	BOOL            m_bFullScreenMode;  // 是否在全屏模式
 	int				m_captionHeight;	// 上面title高度
 	int				m_toolsHeight;		// 下面tools高度
+	TCHAR			m_strTxt[MAX_PATH];
 };

@@ -5,6 +5,9 @@
 #include "stdafx.h"
 #include "PlayerDlg.h"	
 
+
+#define TIMER_ID_HIDE_TEXT     3
+
 PlayerDlg::PlayerDlg() : SHostWnd(_T("LAYOUT:XML_PLAYERWND"))
 {
 	m_bLayoutInited = FALSE;
@@ -137,6 +140,24 @@ void PlayerDlg::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 }
 
+void PlayerDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	switch (nIDEvent)
+	{
+	case TIMER_ID_HIDE_TEXT:
+		KillTimer(TIMER_ID_HIDE_TEXT);
+		player_textout(m_hplayer, 0, 0, 0, NULL);
+		m_strTxt[0] = '\0';
+		break;
+	}
+}
+
+void PlayerDlg::PlayerShowText(int time)
+{
+	player_textout(m_hplayer, 20, 20, RGB(0, 255, 0), m_strTxt);
+	SetTimer(TIMER_ID_HIDE_TEXT, time);
+}
+
 void PlayerDlg::SetPlayUrl(char *url, int voiceType)
 {
 	m_voiceType = voiceType;
@@ -147,11 +168,15 @@ void PlayerDlg::OnRecord()
 {
 	player_record(m_hplayer, m_bIsRecording ? NULL : "record.mp4");
 	m_bIsRecording = !m_bIsRecording;
+	_stprintf(m_strTxt, TEXT("%s: record.mp4"), m_bIsRecording ? TEXT("开始录屏") : TEXT("结束录屏 保存到当前路径"));
+	PlayerShowText(2000);
 }
 
 void PlayerDlg::OnSnapshot()
 {
 	player_snapshot(m_hplayer, "snapshot.jpg", 0, 0, 1000);
+	_tcscpy(m_strTxt, TEXT("抓拍到当前路径：snapshot.jpg"));
+	PlayerShowText(2000);
 }
 
 void PlayerDlg::OnVolume()
@@ -179,8 +204,7 @@ void PlayerDlg::FullScreen(BOOL bFull)
 
 	if (bFull)
 	{
-		m_captionHeight = 0;
-		m_toolsHeight = 0;
+
 		::GetWindowPlacement(m_hWnd, &m_OldWndPlacement);
 
 		if (::IsZoomed(m_hWnd))
@@ -188,7 +212,9 @@ void PlayerDlg::FullScreen(BOOL bFull)
 			::ShowWindow(m_hWnd, SW_SHOWDEFAULT);
 		}
 
-		::SetWindowPos(m_hWnd, HWND_TOPMOST, -iBorderX, -iBorderY, GetSystemMetrics(SM_CXSCREEN) + 2 * iBorderX, GetSystemMetrics(SM_CYSCREEN) + 2 * iBorderY, 0);
+		::SetWindowPos(m_hWnd, HWND_TOP, -iBorderX, -iBorderY, GetSystemMetrics(SM_CXSCREEN) + 2 * iBorderX, GetSystemMetrics(SM_CYSCREEN) + 2 * iBorderY + m_captionHeight + m_toolsHeight, 0);
+		m_captionHeight = 0;
+		m_toolsHeight = 0;
 		SCaption  *cap = FindChildByID2<SCaption>(6000);
 		cap->SetVisible(FALSE, TRUE);
 		cap = FindChildByID2<SCaption>(7000);
@@ -200,10 +226,10 @@ void PlayerDlg::FullScreen(BOOL bFull)
 		m_captionHeight = 40;
 		m_toolsHeight = 50;
 		::SetWindowPlacement(m_hWnd, &m_OldWndPlacement);
-		::SetWindowPos(m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		::SetWindowPos(m_hWnd, HWND_NOTOPMOST, 0, 0, 0, m_captionHeight + m_toolsHeight, SWP_NOSIZE | SWP_NOMOVE);
+
 		SCaption  *cap = FindChildByID2<SCaption>(6000);
 		cap->SetVisible(TRUE, TRUE);
-
 		cap = FindChildByID2<SCaption>(7000);
 		cap->SetVisible(TRUE, TRUE);
 	}
