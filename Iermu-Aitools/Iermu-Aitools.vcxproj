@@ -89,7 +89,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SOUIPATH)\config;$(SOUIPATH)\components;$(SOUIPATH)\SOUI\include;$(SOUIPATH)\utilities\include;socket\include;..\Iermu-Player\src;httpserver\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SOUIPATH)\config;$(SOUIPATH)\components;$(SOUIPATH)\SOUI\include;$(SOUIPATH)\utilities\include;socket\include;..\Iermu-Player\src;httpserver\include;httpclient\include;json;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;_DEBUG;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BrowseInformation>true</BrowseInformation>
@@ -100,7 +100,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SOUIPATH)\bin;lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>utilitiesd.lib;souid.lib;Iermu-Player.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>utilitiesd.lib;souid.lib;Iermu-Player.lib;lib_jsond.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <ResourceCompile>
@@ -113,7 +113,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SOUIPATH)\config;$(SOUIPATH)\components;$(SOUIPATH)\SOUI\include;$(SOUIPATH)\utilities\include;socket\include;..\Iermu-Player\src;httpserver\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SOUIPATH)\config;$(SOUIPATH)\components;$(SOUIPATH)\SOUI\include;$(SOUIPATH)\utilities\include;socket\include;..\Iermu-Player\src;httpserver\include;httpclient\include;json;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -122,7 +122,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SOUIPATH)\bin;lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>utilities.lib;soui.lib;Iermu-Player.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>utilities.lib;soui.lib;Iermu-Player.lib;lib_json.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <ResourceCompile>
@@ -181,6 +181,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AdapterIP.cpp" />
+    <ClCompile Include="httpclient\src\HttpConnect.cpp" />
+    <ClCompile Include="httpclient\src\HttpSocket.cpp" />
+    <ClCompile Include="httpclient\src\IHttp.cpp" />
     <ClCompile Include="httpserver\src\ATW.cpp" />
     <ClCompile Include="httpserver\src\FCGICache.cpp" />
     <ClCompile Include="httpserver\src\FCGIFactory.cpp" />
@@ -222,6 +225,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdapterIP.h" />
+    <ClInclude Include="httpclient\include\HttpConnect.h" />
+    <ClInclude Include="httpclient\include\HttpSocket.h" />
+    <ClInclude Include="httpclient\include\IHttpInterface.h" />
     <ClInclude Include="httpserver\include\ATW.h" />
     <ClInclude Include="httpserver\include\fastcgi.h" />
     <ClInclude Include="httpserver\include\FCGICache.h" />
@@ -288,7 +294,9 @@
     <Xml Include="uires\xml\dlg_main.xml">
       <SubType>Designer</SubType>
     </Xml>
-    <Xml Include="uires\xml\dlg_player.xml" />
+    <Xml Include="uires\xml\dlg_player.xml">
+      <SubType>Designer</SubType>
+    </Xml>
     <Xml Include="uires\xml\dlg_realwnd.xml">
       <SubType>Designer</SubType>
     </Xml>

@@ -8,6 +8,7 @@
 #include "MainDlg.h"
 #include "HTTPConfig.h"
 #include "HTTPServer.h"
+#include "json.h"
 
 using namespace std;
 #pragma comment(lib,"Iphlpapi.lib")
@@ -155,6 +156,9 @@ void CMainDlg::InitSetEvent()
 	SCheckBox *check_switch_rec = FindChildByName2<SCheckBox>(L"check_switch_rec");
 	check_switch_rec->GetEventSet()->subscribeEvent(EventCmd::EventID, Subscriber(&CMainDlg::OnListenRECSwitchCheckBox, this));
 
+	SComboBox *cbx_step3_net = FindChildByName2<SComboBox>(L"cbx_step3_net");
+	cbx_step3_net->GetEventSet()->subscribeEvent(EventCBSelChange::EventID, Subscriber(&CMainDlg::OnListenNetSelChangeBox, this));
+
 }
 
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
@@ -295,15 +299,38 @@ int CMainDlg::GetLocalIPInfo(SArray<UserInfo> &Info)
 			} while (pIpAddrString);
 			pIpAdapterInfo = pIpAdapterInfo->Next;
 		}
-
 	}
+
 	//释放内存空间
 	if (pIpAdapterInfo)
 	{
 		delete pIpAdapterInfo;
 	}
-
 	return 0;
+}
+
+bool CMainDlg::GetDNS(char *szDns1, char *szDns2)
+{
+	//获取DNS服务器信息
+	FIXED_INFO *fi = (FIXED_INFO *)GlobalAlloc(GPTR, sizeof(FIXED_INFO));
+	ULONG ulOutBufLen = sizeof(FIXED_INFO);
+	DWORD ret = ::GetNetworkParams(fi, &ulOutBufLen);
+	if (ret != ERROR_SUCCESS)
+	{
+		GlobalFree(fi);
+		fi = (FIXED_INFO *)GlobalAlloc(GPTR, ulOutBufLen);
+		ret = ::GetNetworkParams(fi, &ulOutBufLen);
+		if (ret != ERROR_SUCCESS)
+		{
+			return false;
+		}
+	}
+	strcpy(szDns1, fi->DnsServerList.IpAddress.String);
+	IP_ADDR_STRING *pIPAddr = fi->DnsServerList.Next;
+	if (pIPAddr != NULL)
+		strcpy(szDns2, pIPAddr->IpAddress.String);
+
+	return true;
 }
 
 void CMainDlg::SetLocalIPView(void)
@@ -506,7 +533,7 @@ void CMainDlg::OnMenuLoadLocalPort()
 bool CMainDlg::OnFormatSDcard()
 {
 	FindChildByName2<SWindow>(L"text_formate_progress")->SetVisible(TRUE, TRUE);
-	return SendCMD(OPT_FORMAT_SDCARD);
+	return SendCMD(OPT_FORMAT_SDCARD, (REQUEST_TYPE)0, "", "");
 }
 
 void CMainDlg::GetCameraInfo()
@@ -522,7 +549,7 @@ void CMainDlg::GetCameraInfo()
 
 	if (CheckIp(0, L"edit_cameraIp", _T("请输入摄像机IP"), m_cameraIp))
 	{
-		if(SendCMD(OPT_GETCAMERA_INFO))
+		if (SendCMD(OPT_GETCAMERA_INFO, (REQUEST_TYPE)0, "", ""))
 			SetDisplayProgress(L"camera_ip_progress", L"camera_ip_win");
 	}
 }
@@ -615,11 +642,25 @@ bool CMainDlg::OnListenRECSwitchCheckBox(EventArgs *pEvtBase)
 	return true;
 }
 
-bool CMainDlg::SendCMD(SOCKETOPTION opt)
+bool CMainDlg::OnListenNetSelChangeBox(EventArgs *pEvtBase)
+{
+	SComboBox *sCbx = sobj_cast<SComboBox>(pEvtBase->sender);
+	if (sCbx->GetCurSel())
+		FindChildByName2<SWindow>(L"wnd_step3_ip")->SetVisible(TRUE, TRUE);
+	else
+		FindChildByName2<SWindow>(L"wnd_step3_ip")->SetVisible(FALSE, TRUE);
+
+	return true;
+}
+
+bool CMainDlg::SendCMD(SOCKETOPTION opt, REQUEST_TYPE type, string url, string data)
 {
 	//开启线程发送命令
 	memset(&m_data, 0, sizeof(SocketData));
 	m_data.opt = opt;
+	m_data.type = type;
+	m_data.url = url;
+	m_data.data = data;
 	LPVOID param = (LPVOID)&m_data;
 
 	return OnStartSocketThread(param);
@@ -913,7 +954,7 @@ bool CMainDlg::SetCameraGeneral(void)
 	//人脸打码
 	m_cinfo.ffs.face_cod = FindChildByName2<SComboBox>(L"cbx_mark_face")->GetCurSel() & 1;
 
-	return SendCMD(OPT_SETCAMERA_GENERAL);	
+	return SendCMD(OPT_SETCAMERA_GENERAL, (REQUEST_TYPE)0, "", "");
 }
 
 bool CMainDlg::SetCameraServer()
@@ -1065,7 +1106,7 @@ bool CMainDlg::SetCameraServer()
 		m_cinfo.ipp.port = port;
 	}
 
-	return SendCMD(OPT_SETCAMERA_SERVER);
+	return SendCMD(OPT_SETCAMERA_SERVER, (REQUEST_TYPE)0, "", "");
 }
 
 bool CMainDlg::SetCameraStore()
@@ -1196,7 +1237,7 @@ bool CMainDlg::SetCameraStore()
 		m_cinfo.af.jpgmem = (int)(djpgmem * 1000);
 
 
-	return SendCMD(OPT_SETCAMERA_STORE);
+	return SendCMD(OPT_SETCAMERA_STORE, (REQUEST_TYPE)0, "", "");
 }
 
 bool CMainDlg::SetCameraOther()
@@ -1208,7 +1249,7 @@ bool CMainDlg::SetCameraOther()
 
 	m_cinfo.af.lan |= ((cbx_lan << 7) | (cbx_network << 6));
 
-	return SendCMD(OPT_SETCAMERA_OTHER);
+	return SendCMD(OPT_SETCAMERA_OTHER, (REQUEST_TYPE)0, "", "");
 }
 
 
@@ -1254,7 +1295,7 @@ void CMainDlg::SetCameraIP(char *ip)
 
 bool CMainDlg::SetCameraTime()
 {
-	return SendCMD(OPT_SETTIME_SYNC);
+	return SendCMD(OPT_SETTIME_SYNC, (REQUEST_TYPE)0, "", "");
 }
 
 // Dpflag  flase： 隐藏  true: 显示  
@@ -1318,7 +1359,7 @@ void CMainDlg::GetCameraList()
 {
 	if (CheckIp(1, L"edit_localIp", _T("请输入本机IP"), m_localIp))
 	{
-		if(SendCMD(OPT_GETCAMERA_LIST))
+		if (SendCMD(OPT_GETCAMERA_LIST, (REQUEST_TYPE)0, "", ""))
 			SetDisplayProgress(L"local_ip_progress", L"local_ip_win");
 	}
 }
@@ -1389,6 +1430,109 @@ bool CMainDlg::GetNASError(WinSocketClient &client, SStringT &code)
 	}
 
 	return ret;
+}
+
+void CMainDlg::OnStepChange(int pre, int back)
+{
+	switch (pre)
+	{
+	case 0:
+		FindChildByName2<SWindow>(L"step0_operation")->SetVisible(FALSE, TRUE);
+		break;
+	case 1:
+		FindChildByName2<SWindow>(L"step1_operation")->SetVisible(FALSE, TRUE);
+		FindChildByName2<SWindow>(L"current_step1")->SetVisible(FALSE, TRUE);
+		FindChildByName2<SWindow>(L"step1")->SetVisible(TRUE, TRUE);
+		break;
+	case 2:
+		FindChildByName2<SWindow>(L"step2_operation")->SetVisible(FALSE, TRUE);
+		FindChildByName2<SWindow>(L"current_step2")->SetVisible(FALSE, TRUE);
+		FindChildByName2<SWindow>(L"step2")->SetVisible(TRUE, TRUE);
+		break;
+	case 3:
+		FindChildByName2<SWindow>(L"step3_operation")->SetVisible(FALSE, TRUE);
+		FindChildByName2<SWindow>(L"current_step3")->SetVisible(FALSE, TRUE);
+		FindChildByName2<SWindow>(L"step3")->SetVisible(TRUE, TRUE);
+		break;
+	case 4:
+		FindChildByName2<SWindow>(L"step4_operation")->SetVisible(FALSE, TRUE);
+		FindChildByName2<SWindow>(L"current_step4")->SetVisible(FALSE, TRUE);
+		FindChildByName2<SWindow>(L"step4")->SetVisible(TRUE, TRUE);
+		break;
+		
+	}
+
+	switch (back)
+	{
+	case 0:
+		FindChildByName2<SWindow>(L"step0_operation")->SetVisible(TRUE, TRUE);
+		break;
+	case 1:
+		FindChildByName2<SWindow>(L"step1_operation")->SetVisible(TRUE, TRUE);
+		FindChildByName2<SWindow>(L"current_step1")->SetVisible(TRUE, TRUE);
+		FindChildByName2<SWindow>(L"step1")->SetVisible(FALSE, TRUE);
+		break;
+	case 2:
+		FindChildByName2<SWindow>(L"step2_operation")->SetVisible(TRUE, TRUE);
+		FindChildByName2<SWindow>(L"current_step2")->SetVisible(TRUE, TRUE);
+		FindChildByName2<SWindow>(L"step2")->SetVisible(FALSE, TRUE);
+		break;
+	case 3:
+		FindChildByName2<SWindow>(L"step3_operation")->SetVisible(TRUE, TRUE);
+		FindChildByName2<SWindow>(L"current_step3")->SetVisible(TRUE, TRUE);
+		FindChildByName2<SWindow>(L"step3")->SetVisible(FALSE, TRUE);
+		break;
+	case 4:
+		FindChildByName2<SWindow>(L"step4_operation")->SetVisible(TRUE, TRUE);
+		FindChildByName2<SWindow>(L"current_step4")->SetVisible(TRUE, TRUE);
+		FindChildByName2<SWindow>(L"step4")->SetVisible(FALSE, TRUE);
+		break;
+	}
+}
+
+void CMainDlg::OnStepOne()
+{
+	SStringT  usrName = FindChildByName2<SEdit>(L"edit_step1_username")->GetWindowTextW();
+	SStringT  usrpasswd = FindChildByName2<SEdit>(L"edit_step1_passwd")->GetWindowTextW();
+
+	if (!usrName.GetLength())
+	{
+		MessageBox(NULL, _T("请输入账号"), _T("提示"), MB_OK | MB_ICONERROR);
+		return;
+	}
+	if (!usrpasswd.GetLength())
+	{
+		MessageBox(NULL, _T("请输入密码"), _T("提示"), MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	string usr = S_CT2A(usrName);
+	string passwd = S_CT2A(usrpasswd);
+	string data = "client_id=j095DeA6kUL9oqZrcdmm&grant_type=password&lang=zh-Hans";
+	data.append("&mobile=").append(usr).append("&password=").append(passwd);
+
+	//开启线程发送命令
+	SendCMD(OPT_LOGIN, POST, AUTHORIZATION_URL, data);
+	OnStepChange(1, 0);
+}
+
+void CMainDlg::OnStepTwo()
+{
+	SStringT  device = FindChildByName2<SEdit>(L"edit_step2_device")->GetWindowTextW();
+	if (!device.GetLength())
+	{
+		MessageBox(NULL, _T("请输入设备号"), _T("提示"), MB_OK | MB_ICONERROR);
+		return;
+	}
+	int sel = FindChildByName2<SComboBox>(L"cbx_step2_cloud")->GetCurSel();
+	int connect_type = sel ? 1:2;
+	string deviceid = S_CT2A(device);
+	string data = "deviceid=";
+	data.append(deviceid).append("&device_type=1&desc=我的摄像机&connect_type=").append(to_string(connect_type)).append("&method=register&access_token=").append(m_token);
+
+	//开启线程发送命令
+	SendCMD(OPT_REGISTRE, POST, GETDEVICEINFO_URL, data);
+	OnStepChange(2, 0);
 }
 
 UINT CMainDlg::Run(LPVOID data)
@@ -1527,6 +1671,24 @@ UINT CMainDlg::Run(LPVOID data)
 			pEvt->retOK = client.SetCameraTime(m_cinfo.cad.cameraip, dt, true);
 			break;
 		}
+
+		case OPT_LOGIN:
+		{
+			CHttpConnect WinClient;
+
+			pEvt->hData = WinClient.Request(param->url, param->type, param->data);
+			pEvt->retOK = WinClient.GetStatusIsOK();
+			break;
+		}
+
+		case OPT_REGISTRE:
+		{
+			CHttpConnect WinClient;
+
+			pEvt->hData = WinClient.Request(param->url, param->type, param->data);
+			pEvt->retOK = WinClient.GetStatusIsOK();
+			break;
+		}
 	}
 	Sleep(500);
 	SNotifyCenter::getSingleton().FireEventAsync(pEvt);
@@ -1657,7 +1819,53 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 				MessageBox(NULL, _T("设置时间成功！"), _T("提示"), MB_OK);
 			}
 			break;
-
+		case OPT_LOGIN:
+			if (pEvt->retOK)
+			{
+				Json::Reader reader;
+				Json::Value jsonobj;
+				if (!reader.parse(pEvt->hData, jsonobj))
+				{
+					OnStepChange(0, 1);
+					MessageBox(NULL, _T("请检查网络后重试"), _T("网络错误"), MB_OK | MB_ICONERROR);
+					return false;
+				}
+				m_uid = jsonobj["uid"].asString();
+				m_token = jsonobj["access_token"].asString();
+				if (!m_token.empty())
+				{
+					OnStepChange(0, 2);
+				}
+			}
+			else
+			{
+				OnStepChange(0, 1);
+				MessageBox(NULL, _T("请输入正确的爱耳目账号密码!"), _T("账号或密码错误"), MB_OK | MB_ICONERROR);
+			}			
+			break;
+		case OPT_REGISTRE:
+			if (pEvt->retOK)
+			{
+				Json::Reader reader;
+				Json::Value jsonobj;
+				if (!reader.parse(pEvt->hData, jsonobj))
+				{
+					OnStepChange(0, 2);
+					MessageBox(NULL, _T("请检查网络后重试"), _T("网络错误"), MB_OK | MB_ICONERROR);
+					return false;
+				}
+				string stream_id = jsonobj["stream_id"].asString();
+				if (!stream_id.empty())
+				{
+					OnStepChange(0, 3);
+				}
+			}
+			else
+			{
+				OnStepChange(0, 2);
+				MessageBox(NULL, _T("请检查设备ID，云平台，网络!"), _T("注册失败"), MB_OK | MB_ICONERROR);
+			}
+			break;
 		default:
 			MessageBox(NULL, _T("设置失败，\n请重新设置！"), _T("提示"), MB_OK | MB_ICONERROR);
 			break;

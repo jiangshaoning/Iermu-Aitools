@@ -2,10 +2,14 @@
 #include <iostream>
 #include <ws2tcpip.h> 
 #include "UpnpTool.h"
+#include "HttpConnect.h"
 
 #pragma comment(lib, "ws2_32.lib") 
-using namespace std;
 
+
+#define AUTHORIZATION_URL	"https://api.iermu.com/oauth2/token"
+#define GETUSERINFO_URL		"https://api.iermu.com/v2/passport/user?"
+#define GETDEVICEINFO_URL	"https://api.iermu.com/v2/pcs/device"
 
 #define CAMERA_USERNAME					"88888888"
 #define CAMERA_USERPWD					"88888888"
@@ -33,7 +37,9 @@ typedef enum
 	OPT_SETCAMERA_STORE,			//设置储存配置
 	OPT_SETCAMERA_OTHER,			//设置其他
 	OPT_SETTIME_SYNC,				//时间同步
-	OPT_FORMAT_SDCARD				//格式化SD卡
+	OPT_FORMAT_SDCARD,				//格式化SD卡
+	OPT_LOGIN,						//登录(http协议)
+	OPT_REGISTRE					//注册(http协议)
 }SOCKETOPTION;
 
 
@@ -50,6 +56,7 @@ typedef struct
 typedef struct
 {
 	SOCKETOPTION opt;
+	REQUEST_TYPE type;
 	string url;
 	IPPort ipp;
 	string data;
@@ -145,6 +152,7 @@ public:
 
 	SOCKETOPTION opt;
 	bool  retOK;
+	string hData;
 	SStringT nData;
 	int progress; //进度值
 };

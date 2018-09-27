@@ -49,13 +49,14 @@ private:
 	BOOL BrowseDir(SStringT &path, HWND hwndOwner, SStringT title);
 	void SetPicturePath();
 	void SetServer();
+	bool GetDNS(char *szDns1, char *szDns2);
 	void OnOpenPlay(int voiceType);
 	void OnPlay();
 	void OnPlayNoVoice();
 	void UpdateCameraInfo();
 	void GetTime(DateTime &dt);
 	bool CheckIp(int type, LPCWSTR pszName, LPCWSTR tipName, string &ip);
-	bool SendCMD(SOCKETOPTION opt);
+	bool SendCMD(SOCKETOPTION opt, REQUEST_TYPE type, string url, string data);
 	bool GetNASError(WinSocketClient &client, SStringT &code);
 	void OnMenuShowLocalIP();
 	void OnMenuHideLocalIP();
@@ -65,6 +66,7 @@ private:
 	bool OnListenAnonymousCheckBox(EventArgs *pEvtBase);
 	bool OnListenNASSwitchCheckBox(EventArgs *pEvtBase);
 	bool OnListenRECSwitchCheckBox(EventArgs *pEvtBase);
+	bool OnListenNetSelChangeBox(EventArgs *pEvtBase);
 	void GoToCameraInfoPage();
 	void GoToCameraListPage();
 	bool SetCameraGeneral();
@@ -74,8 +76,11 @@ private:
 	bool OnStartSocketThread(LPVOID data);
 	bool OnMainSocketThread(EventArgs *e);
 	int  GetLocalIPInfo(SArray<UserInfo> &Info);
-	void SetLocalIPView(void);
+	void SetLocalIPView();
 	void BackToTabpage();
+	void OnStepChange(int pre, int back);
+	void OnStepOne();
+	void OnStepTwo();
 	virtual UINT Run(LPVOID data);
 	virtual int GetID() const { return SENDER_MAINDLG_ID; }
 protected:
@@ -87,6 +92,8 @@ protected:
 		EVENT_NAME_COMMAND(L"btn_restore", OnRestore)
 		EVENT_NAME_COMMAND(L"get_camera_list", GetCameraList)				//通过本机IP获取列表
 		EVENT_NAME_COMMAND(L"get_camera_info", GetCameraInfo)				//通过摄像机IP获取信息	
+		EVENT_NAME_COMMAND(L"btn_step1", OnStepOne)							//第一步登录
+		EVENT_NAME_COMMAND(L"btn_step2", OnStepTwo)							//第二步注册	
 		EVENT_NAME_COMMAND(L"btn_camerainfo_back", BackToTabpage)			//返回按键
 		EVENT_NAME_COMMAND(L"btn_camerainfo_ref", RefreshCameraList)		//刷新列表
 		EVENT_NAME_COMMAND(L"btn_playLive_novoice", OnPlayNoVoice)			//低延迟直播
@@ -122,6 +129,8 @@ private:
 	BOOL					m_bLayoutInited;
 	string					m_localIp;
 	string					m_cameraIp;
+	string					m_uid;
+	string					m_token;
 	SocketData				m_data;
 	BOOL					m_menushow;			//选取本机IP的点击显示或隐藏
 	SArray<UserInfo>		m_userInfo;			//本机ip列表信息
