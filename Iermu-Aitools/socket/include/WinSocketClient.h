@@ -39,7 +39,8 @@ typedef enum
 	OPT_SETTIME_SYNC,				//时间同步
 	OPT_FORMAT_SDCARD,				//格式化SD卡
 	OPT_LOGIN,						//登录(http协议)
-	OPT_REGISTRE					//注册(http协议)
+	OPT_REGISTRE,					//注册(http协议)
+	OPT_GETONLINE					//获取上线状态
 }SOCKETOPTION;
 
 

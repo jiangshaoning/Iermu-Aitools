@@ -280,20 +280,25 @@ int CMainDlg::GetLocalIPInfo(SArray<UserInfo> &Info)
 		//可能有多网卡,因此通过循环去判断
 		while (pIpAdapterInfo)
 		{
-			cout << "网卡数量：" << ++netCardNum << endl;
-			cout << "网卡描述：" << pIpAdapterInfo->Description << endl;
+			//cout << "网卡数量：" << ++netCardNum << endl;
+			//cout << "网卡描述：" << pIpAdapterInfo->Description << endl;
 			ui.strName = S_CA2T(pIpAdapterInfo->Description);
+			ui.strAdapterName = S_CA2T(pIpAdapterInfo->AdapterName);
+			//cout << "网卡IP地址如下：" << endl;
 
-			cout << "网卡IP地址如下：" << endl;
 			//可能网卡有多IP,因此通过循环去判断
 			IP_ADDR_STRING *pIpAddrString = &(pIpAdapterInfo->IpAddressList);
 			do
 			{
-				cout << "该网卡上的IP数量：" << ++IPnumPerNetCard << endl;
-				cout << "IP 地址：" << pIpAddrString->IpAddress.String << endl;			
+				//cout << "该网卡上的IP数量：" << ++IPnumPerNetCard << endl;
+				//cout << "IP 地址：" << pIpAddrString->IpAddress.String << endl;			
 				if (strcmp(pIpAdapterInfo->GatewayList.IpAddress.String, "0.0.0.0") == 0)
 					break;
+				ui.dhcpEnabled = pIpAdapterInfo->DhcpEnabled;
 				ui.strIp = S_CA2T(pIpAddrString->IpAddress.String);
+				ui.strMask = pIpAddrString->IpMask.String;
+				ui.strGateway = pIpAdapterInfo->GatewayList.IpAddress.String;
+				ui.strDns = pIpAdapterInfo->DhcpServer.IpAddress.String;
 				Info.Add(ui);
 				pIpAddrString = pIpAddrString->Next;
 			} while (pIpAddrString);
@@ -307,30 +312,6 @@ int CMainDlg::GetLocalIPInfo(SArray<UserInfo> &Info)
 		delete pIpAdapterInfo;
 	}
 	return 0;
-}
-
-bool CMainDlg::GetDNS(char *szDns1, char *szDns2)
-{
-	//获取DNS服务器信息
-	FIXED_INFO *fi = (FIXED_INFO *)GlobalAlloc(GPTR, sizeof(FIXED_INFO));
-	ULONG ulOutBufLen = sizeof(FIXED_INFO);
-	DWORD ret = ::GetNetworkParams(fi, &ulOutBufLen);
-	if (ret != ERROR_SUCCESS)
-	{
-		GlobalFree(fi);
-		fi = (FIXED_INFO *)GlobalAlloc(GPTR, ulOutBufLen);
-		ret = ::GetNetworkParams(fi, &ulOutBufLen);
-		if (ret != ERROR_SUCCESS)
-		{
-			return false;
-		}
-	}
-	strcpy(szDns1, fi->DnsServerList.IpAddress.String);
-	IP_ADDR_STRING *pIPAddr = fi->DnsServerList.Next;
-	if (pIPAddr != NULL)
-		strcpy(szDns2, pIPAddr->IpAddress.String);
-
-	return true;
 }
 
 void CMainDlg::SetLocalIPView(void)
@@ -1432,7 +1413,59 @@ bool CMainDlg::GetNASError(WinSocketClient &client, SStringT &code)
 	return ret;
 }
 
-void CMainDlg::OnStepChange(int pre, int back)
+void CMainDlg::ConfigureNative()
+{
+	int i, dhcp = 0;
+	HKEY hk;
+	long ret;
+	wchar_t keyname[200] = { 0 }, buf[256] = { 0 };
+	char cmd[256] = { 0 };
+	SStringT name = L"";
+	string alias;
+	DWORD size;
+	DWORD m_attr = REG_BINARY | REG_DWORD | REG_EXPAND_SZ | REG_MULTI_SZ | REG_NONE | REG_SZ;
+
+	GetLocalIPInfo(m_userInfo);
+	for (i = 0; i < m_userInfo.GetCount(); i++)
+	{
+		if (!m_userInfo.GetAt(i).dhcpEnabled)
+		{
+			name = m_userInfo.GetAt(i).strAdapterName;
+			break;
+		}
+	}
+	if (!name.GetLength())
+	{
+		dhcp = 1;
+		i = 0;
+	}
+	name = m_userInfo.GetAt(i).strAdapterName;
+
+	SStringT tkeyname = SStringT().Format(_T("SYSTEM\\CurrentControlSet\\Control\\Network\\{4D36E972-E325-11CE-BFC1-08002BE10318}\\%s\\Connection"), name);
+	if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE, tkeyname, NULL, KEY_ALL_ACCESS, &hk))
+	{
+		ret = RegQueryValueEx(hk, L"Name", NULL, &m_attr, (BYTE*)buf, &size);
+	}
+	RegCloseKey(hk);
+
+	if (!ret)
+		alias = S_CW2A((wchar_t *)buf);
+	if (dhcp)
+	{
+		string ip = S_CT2A(m_userInfo.GetAt(i).strIp);
+		sprintf(cmd, "netsh interface ip set address name=\"%s\" source=static address=%s mask=%s gateway=%s gwmetric=0", alias.c_str(), ip.c_str(), m_userInfo.GetAt(i).strMask.c_str(), m_userInfo.GetAt(i).strGateway.c_str());
+		WinExec(cmd, SW_HIDE);
+		memset(cmd, 0, sizeof(cmd));
+		sprintf(cmd, "netsh interface ip set dns name=\"%s\" source = static address=%s register=PRIMARY", alias.c_str(), m_userInfo.GetAt(i).strDns.c_str());
+		WinExec(cmd, SW_HIDE);
+		memset(cmd, 0, sizeof(cmd));
+	}
+
+	sprintf(cmd, "netsh interface ip add address name=\"%s\" address=192.168.1.123 mask=255.255.255.0 gateway=192.168.1.1 gwmetric=0", alias.c_str());
+	WinExec(cmd, SW_HIDE);
+}
+
+void CMainDlg::OnStepChange(int pre, int back, SStringT tip)
 {
 	switch (pre)
 	{
@@ -1465,6 +1498,7 @@ void CMainDlg::OnStepChange(int pre, int back)
 	switch (back)
 	{
 	case 0:
+		FindChildByName2<SWindow>(L"txt_tip")->SetWindowTextW(tip);
 		FindChildByName2<SWindow>(L"step0_operation")->SetVisible(TRUE, TRUE);
 		break;
 	case 1:
@@ -1513,7 +1547,7 @@ void CMainDlg::OnStepOne()
 
 	//开启线程发送命令
 	SendCMD(OPT_LOGIN, POST, AUTHORIZATION_URL, data);
-	OnStepChange(1, 0);
+	OnStepChange(1, 0, L"登录中");
 }
 
 void CMainDlg::OnStepTwo()
@@ -1526,13 +1560,27 @@ void CMainDlg::OnStepTwo()
 	}
 	int sel = FindChildByName2<SComboBox>(L"cbx_step2_cloud")->GetCurSel();
 	int connect_type = sel ? 1:2;
-	string deviceid = S_CT2A(device);
+	m_deviceId = S_CT2A(device);
 	string data = "deviceid=";
-	data.append(deviceid).append("&device_type=1&desc=我的摄像机&connect_type=").append(to_string(connect_type)).append("&method=register&access_token=").append(m_token);
+	data.append(m_deviceId).append("&device_type=1&desc=我的摄像机&connect_type=").append(to_string(connect_type)).append("&method=register&access_token=").append(m_token);
 
 	//开启线程发送命令
 	SendCMD(OPT_REGISTRE, POST, GETDEVICEINFO_URL, data);
-	OnStepChange(2, 0);
+	OnStepChange(2, 0, L"正在注册摄像机");
+}
+
+
+
+void CMainDlg::OnStepThree()
+{
+	OnStepChange(3, 0, L"等待摄像机上线");
+	if (FindChildByName2<SComboBox>(L"cbx_step3_net")->GetCurSel())
+	{
+		ConfigureNative();
+	}
+	string data = "deviceid=";
+	data.append(m_deviceId).append("&method=meta&access_token=").append(m_token);
+	SendCMD(OPT_GETONLINE, GET, GETDEVICEINFO_URL, data);
 }
 
 UINT CMainDlg::Run(LPVOID data)
@@ -1689,6 +1737,15 @@ UINT CMainDlg::Run(LPVOID data)
 			pEvt->retOK = WinClient.GetStatusIsOK();
 			break;
 		}
+
+		case OPT_GETONLINE:
+		{
+			CHttpConnect WinClient;
+
+			pEvt->hData = WinClient.Request(param->url, param->type, param->data);
+			pEvt->retOK = WinClient.GetStatusIsOK();
+			break;
+		}
 	}
 	Sleep(500);
 	SNotifyCenter::getSingleton().FireEventAsync(pEvt);
@@ -1826,7 +1883,7 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 				Json::Value jsonobj;
 				if (!reader.parse(pEvt->hData, jsonobj))
 				{
-					OnStepChange(0, 1);
+					OnStepChange(0, 1, L"");
 					MessageBox(NULL, _T("请检查网络后重试"), _T("网络错误"), MB_OK | MB_ICONERROR);
 					return false;
 				}
@@ -1834,12 +1891,12 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 				m_token = jsonobj["access_token"].asString();
 				if (!m_token.empty())
 				{
-					OnStepChange(0, 2);
+					OnStepChange(0, 2, L"");
 				}
 			}
 			else
 			{
-				OnStepChange(0, 1);
+				OnStepChange(0, 1, L"");
 				MessageBox(NULL, _T("请输入正确的爱耳目账号密码!"), _T("账号或密码错误"), MB_OK | MB_ICONERROR);
 			}			
 			break;
@@ -1850,20 +1907,43 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 				Json::Value jsonobj;
 				if (!reader.parse(pEvt->hData, jsonobj))
 				{
-					OnStepChange(0, 2);
+					OnStepChange(0, 2,  L"");
 					MessageBox(NULL, _T("请检查网络后重试"), _T("网络错误"), MB_OK | MB_ICONERROR);
 					return false;
 				}
 				string stream_id = jsonobj["stream_id"].asString();
 				if (!stream_id.empty())
 				{
-					OnStepChange(0, 3);
+					OnStepChange(0, 3, L"");
 				}
 			}
 			else
 			{
-				OnStepChange(0, 2);
+				OnStepChange(0, 2, L"");
 				MessageBox(NULL, _T("请检查设备ID，云平台，网络!"), _T("注册失败"), MB_OK | MB_ICONERROR);
+			}
+			break;
+		case OPT_GETONLINE:
+			if (pEvt->retOK)
+			{
+				Json::Reader reader;
+				Json::Value jsonobj;
+				if (!reader.parse(pEvt->hData, jsonobj))
+				{
+					OnStepChange(0, 3, L"");
+					MessageBox(NULL, _T("请检查网络后重试"), _T("网络错误"), MB_OK | MB_ICONERROR);
+					return false;
+				}
+				string stream_id = jsonobj["stream_id"].asString();
+				if (!stream_id.empty())
+				{
+					OnStepChange(0, 4, L"");
+				}
+			}
+			else
+			{
+				OnStepChange(0, 3, L"");
+				MessageBox(NULL, _T("摄像机上线超时失败"), _T("上线失败"), MB_OK | MB_ICONERROR);
 			}
 			break;
 		default:

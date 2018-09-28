@@ -10,8 +10,13 @@
 #include "PlayerInterface.h"
 
 struct UserInfo {
-	SStringT strName;
-	SStringT strIp;
+	SStringT strName;			//网卡名
+	SStringT strIp;				//IP地址
+	SStringT strAdapterName;	//网卡物理地址
+	string	 strMask;			//掩码
+	string	 strGateway;		//网关
+	string   strDns;			//dns
+	int		 dhcpEnabled;		//是否自动获取ip
 };
 
 class CMainDlg : public SHostWnd
@@ -49,7 +54,6 @@ private:
 	BOOL BrowseDir(SStringT &path, HWND hwndOwner, SStringT title);
 	void SetPicturePath();
 	void SetServer();
-	bool GetDNS(char *szDns1, char *szDns2);
 	void OnOpenPlay(int voiceType);
 	void OnPlay();
 	void OnPlayNoVoice();
@@ -78,9 +82,11 @@ private:
 	int  GetLocalIPInfo(SArray<UserInfo> &Info);
 	void SetLocalIPView();
 	void BackToTabpage();
-	void OnStepChange(int pre, int back);
+	void OnStepChange(int pre, int back, SStringT tip);
+	void ConfigureNative();
 	void OnStepOne();
 	void OnStepTwo();
+	void OnStepThree();
 	virtual UINT Run(LPVOID data);
 	virtual int GetID() const { return SENDER_MAINDLG_ID; }
 protected:
@@ -93,7 +99,8 @@ protected:
 		EVENT_NAME_COMMAND(L"get_camera_list", GetCameraList)				//通过本机IP获取列表
 		EVENT_NAME_COMMAND(L"get_camera_info", GetCameraInfo)				//通过摄像机IP获取信息	
 		EVENT_NAME_COMMAND(L"btn_step1", OnStepOne)							//第一步登录
-		EVENT_NAME_COMMAND(L"btn_step2", OnStepTwo)							//第二步注册	
+		EVENT_NAME_COMMAND(L"btn_step2", OnStepTwo)							//第二步注册
+		EVENT_NAME_COMMAND(L"btn_step3", OnStepThree)						//第三步上线
 		EVENT_NAME_COMMAND(L"btn_camerainfo_back", BackToTabpage)			//返回按键
 		EVENT_NAME_COMMAND(L"btn_camerainfo_ref", RefreshCameraList)		//刷新列表
 		EVENT_NAME_COMMAND(L"btn_playLive_novoice", OnPlayNoVoice)			//低延迟直播
@@ -141,4 +148,5 @@ private:
 	string					m_ConfFileName;		//配置文件路径
 	int						m_curSel;			//当前list选中行
 	PlayerDlg				m_dlgPlayer;
+	string					m_deviceId;			//注册设备id
 };
