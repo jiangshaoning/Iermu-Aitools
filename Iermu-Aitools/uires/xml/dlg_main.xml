@@ -127,6 +127,12 @@
             <window name="wnd_step3_ip" pos="|-200,[10" show="0">
               <text pos="0, 0" width="80" height="30" align="right">IP地址</text>
               <edit name="edit_step3_ip" class="cls_edit" pos="[20,{0" width="260" height="30" colorText="@color/black" cueText="请输入IP地址"></edit>
+              <text pos="0, [10" width="80" height="30" align="right">子网掩码</text>
+              <edit name="edit_step3_mask" class="cls_edit" pos="[20,{0" width="260" height="30" colorText="@color/black" cueText="请输入子网掩码"></edit>
+              <text pos="0, [10" width="80" height="30" align="right">网关地址</text>
+              <edit name="edit_step3_gateway" class="cls_edit" pos="[20,{0" width="260" height="30" colorText="@color/black" cueText="请输入网关"></edit>
+              <text pos="0, [10" width="80" height="30" align="right">DNS地址</text>
+              <edit name="edit_step3_dns" class="cls_edit" pos="[20,{0" width="260" height="30" colorText="@color/black" cueText="请输入DNS"></edit>
             </window>
             <imgbtn name="btn_step3" skin="btn.blue_little" pos="|30,[60" offset="-0.5,-0.5" align="center" colorText="@color/white">下一步</imgbtn>
           </window>

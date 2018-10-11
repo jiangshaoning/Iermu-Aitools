@@ -1689,6 +1689,9 @@ void CMainDlg::OnJumpTwo()
 void CMainDlg::OnStepThree()
 {
 	int a=0, b=0, c=0, d=0;
+	int e=0, f=0, g=0, h=0;
+	int i=0, j=0, k=0, l=0;
+	int m=0, n=0, p=0, q=0;
 	if (FindChildByName2<SComboBox>(L"cbx_step3_net")->GetCurSel())
 	{
 		SStringT tstep3_ip = FindChildByName2<SEdit>(L"edit_step3_ip")->GetWindowTextW();
@@ -1709,6 +1712,60 @@ void CMainDlg::OnStepThree()
 			return;
 		}
 
+		SStringT tstep3_mask = FindChildByName2<SEdit>(L"edit_step3_mask")->GetWindowTextW();
+		if (tstep3_mask.GetLength() > 0)
+		{
+			if (!((swscanf(tstep3_mask, L"%d.%d.%d.%d", &e, &f, &g, &h) == 4) && (e >= 0 && e <= 255)
+				&& (f >= 0 && f <= 255)
+				&& (g >= 0 && g <= 255)
+				&& (h >= 0 && h <= 255)))
+			{
+				MessageBox(NULL, _T("子网掩码格式不正确，请输入正确的子网掩码"), _T("提示"), MB_OK | MB_ICONERROR);
+				return;
+			}
+		}
+		else
+		{
+			MessageBox(NULL, _T("请输入需要配置的摄像机子网掩码"), _T("提示"), MB_OK | MB_ICONERROR);
+			return;
+		}
+
+		SStringT tstep3_gateway = FindChildByName2<SEdit>(L"edit_step3_gateway")->GetWindowTextW();
+		if (tstep3_gateway.GetLength() > 0)
+		{
+			if (!((swscanf(tstep3_gateway, L"%d.%d.%d.%d", &i, &j, &k, &l) == 4) && (i >= 0 && i <= 255)
+				&& (j >= 0 && j <= 255)
+				&& (k >= 0 && k <= 255)
+				&& (l >= 0 && l <= 255)))
+			{
+				MessageBox(NULL, _T("网关格式不正确，请输入正确的网关"), _T("提示"), MB_OK | MB_ICONERROR);
+				return;
+			}
+		}
+		else
+		{
+			MessageBox(NULL, _T("请输入需要配置的摄像机网关"), _T("提示"), MB_OK | MB_ICONERROR);
+			return;
+		}
+
+		SStringT tstep3_dns = FindChildByName2<SEdit>(L"edit_step3_dns")->GetWindowTextW();
+		if (tstep3_dns.GetLength() > 0)
+		{
+			if (!((swscanf(tstep3_dns, L"%d.%d.%d.%d", &m, &n, &p, &q) == 4) && (m >= 0 && m <= 255)
+				&& (n >= 0 && n <= 255)
+				&& (p >= 0 && p <= 255)
+				&& (q >= 0 && q <= 255)))
+			{
+				MessageBox(NULL, _T("dns格式不正确，请输入正确的dns"), _T("提示"), MB_OK | MB_ICONERROR);
+				return;
+			}
+		}
+		else
+		{
+			MessageBox(NULL, _T("请输入需要配置的摄像机dns"), _T("提示"), MB_OK | MB_ICONERROR);
+			return;
+		}
+
 		memset(&m_cameraNet, 0, sizeof(CameraNet));
 
 		m_cameraNet.hostIP[0] = a;
@@ -1716,20 +1773,20 @@ void CMainDlg::OnStepThree()
 		m_cameraNet.hostIP[2] = c;
 		m_cameraNet.hostIP[3] = d;
 
-		m_cameraNet.ipmask[0] = 255;
-		m_cameraNet.ipmask[1] = 255;
-		m_cameraNet.ipmask[2] = 255;
-		m_cameraNet.ipmask[3] = 0;
+		m_cameraNet.ipmask[0] = e;
+		m_cameraNet.ipmask[1] = f;
+		m_cameraNet.ipmask[2] = g;
+		m_cameraNet.ipmask[3] = h;
 
-		m_cameraNet.gateway[0] = a;
-		m_cameraNet.gateway[1] = b;
-		m_cameraNet.gateway[2] = c;
-		m_cameraNet.gateway[3] = 1;
+		m_cameraNet.gateway[0] = i;
+		m_cameraNet.gateway[1] = j;
+		m_cameraNet.gateway[2] = k;
+		m_cameraNet.gateway[3] = l;
 
-		m_cameraNet.dnsip1[0] = a;
-		m_cameraNet.dnsip1[1] = b;
-		m_cameraNet.dnsip1[2] = c;
-		m_cameraNet.dnsip1[3] = 1;
+		m_cameraNet.dnsip1[0] = m;
+		m_cameraNet.dnsip1[1] = n;
+		m_cameraNet.dnsip1[2] = p;
+		m_cameraNet.dnsip1[3] = q;
 
 		m_cameraNet.dnsip2[0] = 8;
 		m_cameraNet.dnsip2[1] = 8;
@@ -1949,7 +2006,6 @@ UINT CMainDlg::Run(LPVOID data)
 				timeout += 500;
 				Sleep(500);
 			}
-
 			break;
 		}
 	}
