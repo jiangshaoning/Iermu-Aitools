@@ -11,6 +11,8 @@
 #define GETUSERINFO_URL		"https://api.iermu.com/v2/passport/user?"
 #define GETDEVICEINFO_URL	"https://api.iermu.com/v2/pcs/device"
 
+
+#define CAMERA_DEFAULTIP				"192.168.1.10"
 #define CAMERA_USERNAME					"88888888"
 #define CAMERA_USERPWD					"88888888"
 #define EVT_SOCKET_BEGIN				(EVT_EXTERNAL_BEGIN + 30000)
@@ -40,9 +42,28 @@ typedef enum
 	OPT_FORMAT_SDCARD,				//格式化SD卡
 	OPT_LOGIN,						//登录(http协议)
 	OPT_REGISTRE,					//注册(http协议)
+	OPT_CANCELLATION,				//注消(http协议)
 	OPT_GETONLINE					//获取上线状态
 }SOCKETOPTION;
 
+
+typedef struct
+{
+	UINT32 dhcp;
+	UINT8 hostIP[4];
+	UINT8 ipmask[4];
+	UINT8 gateway[4];
+	UINT8 dnsip1[4];
+	UINT8 dnsip2[4];
+	UINT16 cmdPort;
+	UINT16 dataPort;
+	UINT16 httpPort;
+	UINT16 talkPort;
+	UINT16 autoConnect;
+	UINT16 reserved;
+	UINT32 centerIp0;
+	UINT32 centerIp1;
+}CameraNet;
 
 typedef struct
 {
@@ -59,7 +80,6 @@ typedef struct
 	SOCKETOPTION opt;
 	REQUEST_TYPE type;
 	string url;
-	IPPort ipp;
 	string data;
 }SocketData;
 
@@ -153,6 +173,7 @@ public:
 
 	SOCKETOPTION opt;
 	bool  retOK;
+	bool  waitOK;
 	string hData;
 	SStringT nData;
 	int progress; //进度值
@@ -196,6 +217,10 @@ public:
 	//格式化SD卡
 	bool SetFormateSDCard(const char *ip);
 	bool GetFormateSDCard(const char *ip, int &progress);
+
+	//非dhcp下设置摄像机网络信息
+	bool GetCameraNET(const char *ip, CameraNet &net);
+	bool SetCameraNET(const char *ip, CameraNet &net, bool save);
 
 	//bool GetPanorama(const char *ip, string &panoTemplate);
 };

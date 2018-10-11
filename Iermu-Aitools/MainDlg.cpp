@@ -10,6 +10,7 @@
 #include "HTTPServer.h"
 #include "json.h"
 
+#define TOKEN		"1.j095DeA6kUL9oqZrcdmm.2592000.1538204705.4a802f17e619293fdaa6cd49615a5724"
 using namespace std;
 #pragma comment(lib,"Iphlpapi.lib")
 #define RELEASEPLAYER(player) \
@@ -122,7 +123,8 @@ public:
 CMainDlg::CMainDlg() : SHostWnd(_T("LAYOUT:XML_MAINWND"))
 {
 	m_bLayoutInited = FALSE;
-	m_switchlist_tab = FALSE;
+	m_set_wnd = MAIN_WND;
+	m_add_wnd = STEP_ONE;
 }
 
 CMainDlg::~CMainDlg()
@@ -144,6 +146,9 @@ int CMainDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CMainDlg::InitSetEvent()
 {
+	STabCtrl *pTabmain = FindChildByName2<STabCtrl>(L"tab_main");
+	pTabmain->GetEventSet()->subscribeEvent(EventTabSelChanged::EventID, Subscriber(&CMainDlg::OnListenTabSelChangePage, this));
+
 	SComboView *pComboView = FindChildByName2<SComboView>(L"cbv_account");
 	pComboView->GetEventSet()->subscribeEvent(EventCBDropdown::EventID, Subscriber(&CMainDlg::OnListenIPDropdownBox, this));
 
@@ -535,20 +540,72 @@ void CMainDlg::GetCameraInfo()
 	}
 }
 
+void CMainDlg::SetDisplayBackBtn(int page, BOOL isShow, BACKTOWND wnd)
+{
+	switch (page)
+	{
+	case 0:
+		m_set_wnd = wnd;
+		break;
+	case 2:
+		m_add_wnd = wnd;
+		break;
+	}
+
+	FindChildByName2<SWindow>(L"btn_camerainfo_back")->SetVisible(isShow, TRUE);
+	FindChildByName2<SWindow>(L"btn_camerainfo_pre")->SetVisible(isShow, TRUE);
+}
+
 void CMainDlg::BackToTabpage()
 {
 	STabCtrl *pTab = FindChildByName2<STabCtrl>(L"irm_main");
+	int selpage = FindChildByName2<STabCtrl>(L"tab_main")->GetCurSel();
 	if (pTab)
 	{
-		if (m_switchlist_tab)
+		if (selpage == 0)
 		{
-			pTab->SetCurSel(_T("camralist_page"));
+			switch (m_set_wnd)
+			{
+			case MAIN_WND:
+				SetDisplayBackBtn(selpage, FALSE, MAIN_WND);
+				pTab->SetCurSel(_T("tab_page"));
+				break;
+			case LIST_WND:
+				SetDisplayBackBtn(selpage, FALSE, MAIN_WND);
+				pTab->SetCurSel(_T("tab_page"));
+				break;
+			case LIST_INFO:
+				SetDisplayBackBtn(selpage, TRUE, LIST_WND);
+				pTab->SetCurSel(_T("camralist_page"));
+				break;
+			case INFO_WND:
+				SetDisplayBackBtn(selpage, FALSE, MAIN_WND);
+				pTab->SetCurSel(_T("tab_page"));
+				break;
+			}
 		}
-		else
+
+		if (selpage == 2)
 		{
-			pTab->SetCurSel(_T("tab_page"));
+			switch (m_add_wnd)
+			{
+			case STEP_ZERO:
+				OnStepChange(0, 0, L"");
+				break;
+			case STEP_ONE:
+				OnStepChange(1, 1, L"");
+				break;
+			case STEP_TWO:
+				OnStepChange(2, 1, L"");
+				break;
+			case STEP_THREE:
+				OnStepChange(3, 2, L"");
+				break;
+			case STEP_FOUR:
+				OnStepChange(4, 3, L"");
+				break;
+			}
 		}
-		m_switchlist_tab = false;
 	}
 }
 
@@ -556,11 +613,34 @@ void CMainDlg::BackToTabpage()
 void CMainDlg::SetCameraInfoPage(int pos)
 {
 	m_curSel = pos;
-	m_switchlist_tab = true;
+	SetDisplayBackBtn(0, TRUE, LIST_INFO);
 	memset(&m_cinfo, 0, sizeof(AICameraInfo));
 	memcpy(&m_cinfo, &m_cinfolist.GetAt(pos), sizeof(AICameraInfo));
 	SetCameraIP(m_cinfo.cad.cameraip);
 	GoToCameraInfoPage();
+}
+
+bool CMainDlg::OnListenTabSelChangePage(EventArgs *pEvtBase)
+{
+	STabCtrl *pTabmain = sobj_cast<STabCtrl>(pEvtBase->sender);
+	BOOL show1 = (m_set_wnd == MAIN_WND) ? FALSE : TRUE;
+	BOOL show2 = (m_add_wnd == STEP_ONE) ? FALSE : TRUE;
+	if (pTabmain)
+	{
+		switch (pTabmain->GetCurSel())
+		{
+		case 0:
+			SetDisplayBackBtn(0, show1, m_set_wnd);
+			break;
+		case 1:
+			SetDisplayBackBtn(0, FALSE, m_set_wnd);
+			break;
+		case 2:
+			SetDisplayBackBtn(2, show2, m_add_wnd);
+			break;
+		}
+	}
+	return true;
 }
 
 bool CMainDlg::OnListenIPDropdownBox(EventArgs *pEvtBase)
@@ -1110,7 +1190,7 @@ bool CMainDlg::SetCameraStore()
 	}
 	//NAS用户名
 	SStringT tnas_user = FindChildByName2<SEdit>(L"edit_nas_user")->GetWindowTextW();
-	if (tnas_ip.GetLength() > 30)
+	if (tnas_user.GetLength() > 30)
 	{
 		MessageBox(NULL, _T("NAS用户名长度不得超过30字符"), _T("提示"), MB_OK | MB_ICONERROR);
 		return false;
@@ -1415,7 +1495,8 @@ bool CMainDlg::GetNASError(WinSocketClient &client, SStringT &code)
 
 void CMainDlg::ConfigureNative()
 {
-	int i, dhcp = 0;
+	size_t i;
+	int dhcp = 0;
 	HKEY hk;
 	long ret;
 	wchar_t keyname[200] = { 0 }, buf[256] = { 0 };
@@ -1461,8 +1542,11 @@ void CMainDlg::ConfigureNative()
 		memset(cmd, 0, sizeof(cmd));
 	}
 
-	sprintf(cmd, "netsh interface ip add address name=\"%s\" address=192.168.1.123 mask=255.255.255.0 gateway=192.168.1.1 gwmetric=0", alias.c_str());
+	sprintf(cmd, "netsh interface ip add address name=\"%s\" address=192.168.1.123 mask=255.255.255.0", alias.c_str());
 	WinExec(cmd, SW_HIDE);
+	//memset(cmd, 0, sizeof(cmd));
+	//sprintf(cmd, "netsh interface ip add dns name=\"%s\" address=192.168.1.1", alias.c_str());
+	//WinExec(cmd, SW_HIDE);
 }
 
 void CMainDlg::OnStepChange(int pre, int back, SStringT tip)
@@ -1500,26 +1584,31 @@ void CMainDlg::OnStepChange(int pre, int back, SStringT tip)
 	case 0:
 		FindChildByName2<SWindow>(L"txt_tip")->SetWindowTextW(tip);
 		FindChildByName2<SWindow>(L"step0_operation")->SetVisible(TRUE, TRUE);
+		SetDisplayBackBtn(2, FALSE, STEP_ZERO);
 		break;
 	case 1:
 		FindChildByName2<SWindow>(L"step1_operation")->SetVisible(TRUE, TRUE);
 		FindChildByName2<SWindow>(L"current_step1")->SetVisible(TRUE, TRUE);
 		FindChildByName2<SWindow>(L"step1")->SetVisible(FALSE, TRUE);
+		SetDisplayBackBtn(2, FALSE, STEP_ONE);
 		break;
 	case 2:
 		FindChildByName2<SWindow>(L"step2_operation")->SetVisible(TRUE, TRUE);
 		FindChildByName2<SWindow>(L"current_step2")->SetVisible(TRUE, TRUE);
 		FindChildByName2<SWindow>(L"step2")->SetVisible(FALSE, TRUE);
+		SetDisplayBackBtn(2, TRUE, STEP_TWO);
 		break;
 	case 3:
 		FindChildByName2<SWindow>(L"step3_operation")->SetVisible(TRUE, TRUE);
 		FindChildByName2<SWindow>(L"current_step3")->SetVisible(TRUE, TRUE);
 		FindChildByName2<SWindow>(L"step3")->SetVisible(FALSE, TRUE);
+		SetDisplayBackBtn(2, TRUE, STEP_THREE);
 		break;
 	case 4:
 		FindChildByName2<SWindow>(L"step4_operation")->SetVisible(TRUE, TRUE);
 		FindChildByName2<SWindow>(L"current_step4")->SetVisible(TRUE, TRUE);
 		FindChildByName2<SWindow>(L"step4")->SetVisible(FALSE, TRUE);
+		SetDisplayBackBtn(2, TRUE, STEP_FOUR);
 		break;
 	}
 }
@@ -1550,6 +1639,22 @@ void CMainDlg::OnStepOne()
 	OnStepChange(1, 0, L"登录中");
 }
 
+void CMainDlg::OnCancelTwo()
+{
+	SStringT  device = FindChildByName2<SEdit>(L"edit_step2_device")->GetWindowTextW();
+	if (!device.GetLength())
+	{
+		MessageBox(NULL, _T("请输入设备号"), _T("提示"), MB_OK | MB_ICONERROR);
+		return;
+	}
+	m_deviceId = S_CT2A(device);
+	string data = "deviceid=";
+	data.append(m_deviceId).append("&method=drop&access_token=").append(m_token);
+	//开启线程发送命令
+	SendCMD(OPT_CANCELLATION, POST, GETDEVICEINFO_URL, data);
+	OnStepChange(2, 0, L"正在注消摄像机");
+}
+
 void CMainDlg::OnStepTwo()
 {
 	SStringT  device = FindChildByName2<SEdit>(L"edit_step2_device")->GetWindowTextW();
@@ -1562,25 +1667,93 @@ void CMainDlg::OnStepTwo()
 	int connect_type = sel ? 1:2;
 	m_deviceId = S_CT2A(device);
 	string data = "deviceid=";
-	data.append(m_deviceId).append("&device_type=1&desc=我的摄像机&connect_type=").append(to_string(connect_type)).append("&method=register&access_token=").append(m_token);
+	data.append(m_deviceId).append("&device_type=1&desc=%e6%88%91%e7%9a%84%e6%91%84%e5%83%8f%e6%9c%ba&connect_type=").append(to_string(connect_type)).append("&method=register&access_token=").append(m_token);
 
 	//开启线程发送命令
 	SendCMD(OPT_REGISTRE, POST, GETDEVICEINFO_URL, data);
 	OnStepChange(2, 0, L"正在注册摄像机");
 }
 
-
+void CMainDlg::OnJumpTwo()
+{
+	SStringT  device = FindChildByName2<SEdit>(L"edit_step2_device")->GetWindowTextW();
+	if (!device.GetLength())
+	{
+		MessageBox(NULL, _T("请输入设备号"), _T("提示"), MB_OK | MB_ICONERROR);
+		return;
+	}
+	m_deviceId = S_CT2A(device);
+	OnStepChange(2, 3, L"");
+}
 
 void CMainDlg::OnStepThree()
 {
-	OnStepChange(3, 0, L"等待摄像机上线");
+	int a=0, b=0, c=0, d=0;
 	if (FindChildByName2<SComboBox>(L"cbx_step3_net")->GetCurSel())
 	{
+		SStringT tstep3_ip = FindChildByName2<SEdit>(L"edit_step3_ip")->GetWindowTextW();
+		if (tstep3_ip.GetLength() > 0)
+		{
+			if (!((swscanf(tstep3_ip, L"%d.%d.%d.%d", &a, &b, &c, &d) == 4) && (a >= 0 && a <= 255)
+				&& (b >= 0 && b <= 255)
+				&& (c >= 0 && c <= 255)
+				&& (d >= 0 && d <= 255)))
+			{
+				MessageBox(NULL, _T("ip格式不正确，请输入正确的ipv4"), _T("提示"), MB_OK | MB_ICONERROR);
+				return;
+			}
+		}
+		else
+		{
+			MessageBox(NULL, _T("请输入需要配置的摄像机IP"), _T("提示"), MB_OK | MB_ICONERROR);
+			return;
+		}
+
+		memset(&m_cameraNet, 0, sizeof(CameraNet));
+
+		m_cameraNet.hostIP[0] = a;
+		m_cameraNet.hostIP[1] = b;
+		m_cameraNet.hostIP[2] = c;
+		m_cameraNet.hostIP[3] = d;
+
+		m_cameraNet.ipmask[0] = 255;
+		m_cameraNet.ipmask[1] = 255;
+		m_cameraNet.ipmask[2] = 255;
+		m_cameraNet.ipmask[3] = 0;
+
+		m_cameraNet.gateway[0] = a;
+		m_cameraNet.gateway[1] = b;
+		m_cameraNet.gateway[2] = c;
+		m_cameraNet.gateway[3] = 1;
+
+		m_cameraNet.dnsip1[0] = a;
+		m_cameraNet.dnsip1[1] = b;
+		m_cameraNet.dnsip1[2] = c;
+		m_cameraNet.dnsip1[3] = 1;
+
+		m_cameraNet.dnsip2[0] = 8;
+		m_cameraNet.dnsip2[1] = 8;
+		m_cameraNet.dnsip2[2] = 8;
+		m_cameraNet.dnsip2[3] = 8;
+
 		ConfigureNative();
+		m_cameraNet.dhcp = 0;
+		
 	}
+	else
+	{
+		m_cameraNet.dhcp = 1;
+	}
+
+	OnStepChange(3, 0, L"等待摄像机上线");
 	string data = "deviceid=";
 	data.append(m_deviceId).append("&method=meta&access_token=").append(m_token);
-	SendCMD(OPT_GETONLINE, GET, GETDEVICEINFO_URL, data);
+	SendCMD(OPT_GETONLINE, POST, GETDEVICEINFO_URL, data);
+}
+
+void CMainDlg::OnStepFour()
+{
+	OnStepChange(4, 2, L"");
 }
 
 UINT CMainDlg::Run(LPVOID data)
@@ -1730,6 +1903,7 @@ UINT CMainDlg::Run(LPVOID data)
 		}
 
 		case OPT_REGISTRE:
+		case OPT_CANCELLATION:
 		{
 			CHttpConnect WinClient;
 
@@ -1737,13 +1911,45 @@ UINT CMainDlg::Run(LPVOID data)
 			pEvt->retOK = WinClient.GetStatusIsOK();
 			break;
 		}
-
 		case OPT_GETONLINE:
 		{
+			int timeout = 0;
+			Json::Reader reader;
+			Json::Value jsonobj;
+			WinSocketClient client;
 			CHttpConnect WinClient;
+			if (!m_cameraNet.dhcp)
+			{
+				CameraNet net;
+				if (!(pEvt->retOK = client.GetCameraNET(CAMERA_DEFAULTIP, net)))
+					break;
 
-			pEvt->hData = WinClient.Request(param->url, param->type, param->data);
-			pEvt->retOK = WinClient.GetStatusIsOK();
+				m_cameraNet.cmdPort = net.cmdPort;
+				m_cameraNet.dataPort = net.dataPort;
+				m_cameraNet.httpPort = net.httpPort;
+				m_cameraNet.talkPort = net.talkPort;
+				m_cameraNet.autoConnect = net.autoConnect;
+				m_cameraNet.reserved = net.reserved;
+				m_cameraNet.centerIp0 = net.centerIp0;
+				m_cameraNet.centerIp1 = net.centerIp1;
+				if (!(pEvt->retOK = client.SetCameraNET(CAMERA_DEFAULTIP, m_cameraNet, true)))
+					break;
+			}
+
+			pEvt->waitOK = false;
+			while (timeout < 30000 && pEvt->waitOK==false)
+			{
+				pEvt->hData = WinClient.Request(param->url, param->type, param->data);
+				if (!reader.parse(pEvt->hData, jsonobj)) 
+					break;
+				int status = atoi(jsonobj["status"].asString().c_str());
+				if ((status> 0) && ((status & 4) == 4)) 
+					pEvt->waitOK = true;
+
+				timeout += 500;
+				Sleep(500);
+			}
+
 			break;
 		}
 	}
@@ -1770,6 +1976,8 @@ bool CMainDlg::OnStartSocketThread(LPVOID data)
 bool CMainDlg::OnMainSocketThread(EventArgs *e)
 {
 	MainSocketThread *pEvt = sobj_cast<MainSocketThread>(e);
+	Json::Reader reader;
+	Json::Value jsonobj;
 	switch (pEvt->opt)
 	{
 		case OPT_GETCAMERA_LIST:
@@ -1781,6 +1989,7 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 				return false;
 			}
 			GoToCameraListPage();
+			SetDisplayBackBtn(0, TRUE, LIST_WND);
 			break;
 
 		case OPT_GETCAMERA_INFO:
@@ -1790,8 +1999,8 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 				MessageBox(NULL, _T("获取配置失败！"), _T("提示"), MB_OK | MB_ICONERROR);
 				return false;
 			}
-
-			GoToCameraInfoPage();			
+			GoToCameraInfoPage();
+			SetDisplayBackBtn(0, TRUE, INFO_WND);
 			break;
 		case OPT_SETCAMERA_GENERAL:
 			if (!pEvt->retOK || m_cameraIp.empty())
@@ -1879,20 +2088,20 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 		case OPT_LOGIN:
 			if (pEvt->retOK)
 			{
-				Json::Reader reader;
-				Json::Value jsonobj;
 				if (!reader.parse(pEvt->hData, jsonobj))
 				{
 					OnStepChange(0, 1, L"");
 					MessageBox(NULL, _T("请检查网络后重试"), _T("网络错误"), MB_OK | MB_ICONERROR);
 					return false;
 				}
-				m_uid = jsonobj["uid"].asString();
 				m_token = jsonobj["access_token"].asString();
 				if (!m_token.empty())
-				{
 					OnStepChange(0, 2, L"");
-				}
+				else
+				{
+					OnStepChange(0, 1, L"");
+					MessageBox(NULL, _T("获取的token无效"), _T("网络错误"), MB_OK | MB_ICONERROR);
+				}			
 			}
 			else
 			{
@@ -1901,49 +2110,113 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 			}			
 			break;
 		case OPT_REGISTRE:
+			if (!reader.parse(pEvt->hData, jsonobj))
+			{
+				OnStepChange(0, 2, L"");
+				MessageBox(NULL, _T("请检查网络后重试"), _T("网络错误"), MB_OK | MB_ICONERROR);
+				return false;
+			}
 			if (pEvt->retOK)
 			{
-				Json::Reader reader;
-				Json::Value jsonobj;
-				if (!reader.parse(pEvt->hData, jsonobj))
-				{
-					OnStepChange(0, 2,  L"");
-					MessageBox(NULL, _T("请检查网络后重试"), _T("网络错误"), MB_OK | MB_ICONERROR);
-					return false;
-				}
-				string stream_id = jsonobj["stream_id"].asString();
-				if (!stream_id.empty())
-				{
-					OnStepChange(0, 3, L"");
-				}
+				OnStepChange(0, 3, L"");
 			}
 			else
 			{
+				SStringT error_msg;
+				int error_code = atoi(jsonobj["error_code"].asString().c_str());
+				switch (error_code)
+				{
+				case 110:
+					error_msg = _T("token无效或过期，请重新登录");
+					break;
+				case 31023:
+					error_msg = _T("访问的参数错误");
+					break;
+				case 31021:
+					error_msg = _T("网络问题");
+					break;
+				case 300100:
+					error_msg = _T("注册平台错误");
+					break;
+				case 31350:
+					error_msg = _T("设备已经注册过");
+					break;
+				case 400306:
+					error_msg = _T("连接用户不存在");
+					break;
+				default:
+					error_msg = _T("添加设备出错");
+					break;
+				}
 				OnStepChange(0, 2, L"");
-				MessageBox(NULL, _T("请检查设备ID，云平台，网络!"), _T("注册失败"), MB_OK | MB_ICONERROR);
+				MessageBox(NULL, error_msg, _T("注册失败"), MB_OK | MB_ICONERROR);
+			}
+			break;
+		case OPT_CANCELLATION:
+			if (!reader.parse(pEvt->hData, jsonobj))
+			{
+				OnStepChange(0, 2, L"");
+				MessageBox(NULL, _T("请检查网络后重试"), _T("网络错误"), MB_OK | MB_ICONERROR);
+				return false;
+			}
+			if (pEvt->retOK)
+			{
+				OnStepChange(0, 2, L"");
+			}
+			else
+			{
+				SStringT error_msg;
+				int error_code = atoi(jsonobj["error_code"].asString().c_str());
+				switch (error_code)
+				{
+				case 110:
+					error_msg = _T("token无效或过期，请重新登录");
+					break;
+				case 31023:
+					error_msg = _T("访问的参数错误");
+					break;
+				case 31021:
+					error_msg = _T("网络问题");
+					break;
+				case 31353:
+					error_msg = _T("设备不存在");
+					break;
+				case 31354:
+					error_msg = _T("当前用户没有该设备得权限");
+					break;
+				case 31399:
+					error_msg = _T("注销设备失败");
+					break;
+				default:
+					error_msg = _T("注销设备失败");
+					break;
+				}
+				OnStepChange(0, 2, L"");
+				MessageBox(NULL, error_msg, _T("注册失败"), MB_OK | MB_ICONERROR);
 			}
 			break;
 		case OPT_GETONLINE:
-			if (pEvt->retOK)
+			if (pEvt->waitOK)
 			{
-				Json::Reader reader;
-				Json::Value jsonobj;
 				if (!reader.parse(pEvt->hData, jsonobj))
-				{
-					OnStepChange(0, 3, L"");
-					MessageBox(NULL, _T("请检查网络后重试"), _T("网络错误"), MB_OK | MB_ICONERROR);
-					return false;
-				}
-				string stream_id = jsonobj["stream_id"].asString();
-				if (!stream_id.empty())
-				{
-					OnStepChange(0, 4, L"");
-				}
+					break;
+
+				SStringT deviceId = S_CA2T(jsonobj["deviceid"].asString().c_str());
+				FindChildByName2<SWindow>(L"step4_deviceid")->SetWindowTextW(deviceId);
+				OnStepChange(0, 4, L"");
 			}
 			else
 			{
-				OnStepChange(0, 3, L"");
-				MessageBox(NULL, _T("摄像机上线超时失败"), _T("上线失败"), MB_OK | MB_ICONERROR);
+				if (pEvt->retOK)
+				{
+					OnStepChange(0, 4, L"");
+					MessageBox(NULL, _T("未能获取摄像机上线状态，请检查外网！"), _T("超时"), MB_OK | MB_ICONERROR);
+				}
+				else
+				{
+					OnStepChange(0, 3, L"");
+					MessageBox(NULL, _T("摄像机上线超时失败"), _T("上线失败"), MB_OK | MB_ICONERROR);
+				}
 			}
 			break;
 		default:

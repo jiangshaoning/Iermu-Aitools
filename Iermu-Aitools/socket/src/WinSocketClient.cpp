@@ -154,6 +154,7 @@ bool WinSocketClient::SendBuffToHost(const char *ip, char *sendbuff, int sendlen
 	setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv_out, sizeof(tv_out));
 
 	n = connect(sockfd, (SOCKADDR*)&addrSrv, sizeof(SOCKADDR));//与服务器进行连接
+	int error = GetLastError();
 	if (n < 0)
 		goto end;
 	//发送给服务器
@@ -632,6 +633,75 @@ bool WinSocketClient::GetFormateSDCard(const char *ip, int &progress)
 		progress = 1000;
 	return ret;
 }
+
+bool WinSocketClient::GetCameraNET(const char *ip, CameraNet &net)
+{
+	bool ret;
+
+	char cmdsetIP[4] = { 0 };
+	short int iplen = 0;
+	char databuf[256] = { 0 };
+
+	//设置IP
+	cmdsetIP[0] = 74;
+	cmdsetIP[1] = 8;
+	memcpy(cmdsetIP + 2, &iplen, 2);
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
+	if (ret)
+	{
+		net.dhcp = ntohl(*((unsigned int *)databuf));
+		memcpy(net.hostIP, databuf + 4, 4);
+		memcpy(net.ipmask, databuf + 8, 4);
+		memcpy(net.gateway, databuf + 12, 4);
+		memcpy(net.dnsip1, databuf + 16, 4);
+		memcpy(net.dnsip2, databuf + 20, 4);
+
+		net.cmdPort = (*((unsigned short *)(databuf + 24)));
+		net.dataPort = (*((unsigned short *)(databuf + 26)));
+		net.httpPort = (*((unsigned short *)(databuf + 28)));
+		net.talkPort = (*((unsigned short *)(databuf + 30)));
+		net.autoConnect = (*((unsigned short *)(databuf + 32)));
+		net.reserved = (*((unsigned short *)(databuf + 34)));
+		net.centerIp0 = (*((unsigned int *)(databuf + 36)));
+		net.centerIp1 = (*((unsigned int *)(databuf + 40)));
+	}
+	return ret;
+}
+
+bool WinSocketClient::SetCameraNET(const char *ip, CameraNet &net, bool save)
+{
+
+	bool ret;
+
+	char cmdsetNet[48] = { 0 };
+	short int iplen = 44;
+	char databuf[256] = { 0 };
+
+	//设置IP
+	cmdsetNet[0] = 75;
+	cmdsetNet[1] = 8;
+	memcpy(cmdsetNet + 2, &iplen, 2);
+	
+	int dhcp = htonl(net.dhcp);
+	memcpy(cmdsetNet + 4, &dhcp, 4);
+	memcpy(cmdsetNet + 8, net.hostIP, 4);
+	memcpy(cmdsetNet + 12, net.ipmask, 4);
+	memcpy(cmdsetNet + 16, net.gateway, 4);
+	memcpy(cmdsetNet + 20, net.dnsip1, 4);
+	memcpy(cmdsetNet + 24, net.dnsip2, 4);
+	memcpy(cmdsetNet + 28, &net.cmdPort, 2);
+	memcpy(cmdsetNet + 30, &net.dataPort, 2);
+	memcpy(cmdsetNet + 32, &net.httpPort, 2);
+	memcpy(cmdsetNet + 34, &net.talkPort, 2);
+	memcpy(cmdsetNet + 36, &net.autoConnect, 2);
+	memcpy(cmdsetNet + 38, &net.reserved, 2);
+	memcpy(cmdsetNet + 40, &net.centerIp0, 4);
+	memcpy(cmdsetNet + 44, &net.centerIp1, 4);
+
+	ret = SendBuffToHost(ip, cmdsetNet, sizeof(cmdsetNet), databuf, true);
+	return ret;
+}
+
 
 
 //bool WinSocketClient::GetPanorama(const char *ip, string &panoTemplate)

@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <include>
-  <imgbtn name="btn_camerainfo_back" skin="btn.back" pos="10, 15"></imgbtn>
-  <imgbtn name="btn_camerainfo_pre" skin="btn.pre" pos="[1, {0" ></imgbtn>
-  <imgbtn name="btn_camerainfo_ref" skin="btn.ref" pos="[10, {0" ></imgbtn>
-  <window pos="0, [20, -0, -0" colorBkgnd="@color/white" >
-    <window name="refresh_progress" pos="0, [0, -0, -0" show="0" display ="0" animate="1">
-      <text pos="|-0, |-0" offset="-0.5, -0.5" font="adding:11" colorText="@color/black" align="center">正在刷新列表中...</text>
+  <window pos="0, [0, -0, -0" colorBkgnd="@color/white" colorText="@color/black">
+    <window pos="0, 0, 50, 420" font="adding:6">
+      <text pos="50, 10">本机IP:</text>
+      <text pos="[1, {0" name="txt_lanip" width="110" align="center">127.0.0.1</text>
+      <text pos="[1, {0">同一局域网内的摄像机</text>
     </window>
-   
-    <mclistview name="cameralist_win" pos="0,[0,-0,-0" headerHeight="50" show="1">
-      <header align="center" matchParent="1" sortSkin="_skin_lcex_header_arrow" itemSkin="_skin_lcex_header" itemSwapEnable="1" fixWidth="0" wantTab="1" sortHeader="1" colorBkgnd="#ffffff" >
+    <imgbtn name="btn_camerainfo_ref" skin="btn.ref" pos="420, 13"></imgbtn>
+    
+    <mclistview name="cameralist_win" pos="0,50,-0,-0" headerHeight="50" show="1">
+      <header align="center" matchParent="1" sortSkin="_skin_lcex_header_arrow" itemSkin="_skin_lcex_header" itemSwapEnable="1" colorText="@color/black" fixWidth="0" wantTab="1" sortHeader="1" colorBkgnd="#ffffff" >
         <items>
           <item width="200">设备ID</item>
           <item width="200">设备IP</item>
@@ -31,6 +31,8 @@
         </window>
       </template>
     </mclistview>
-    
+    <window name="refresh_progress" pos="0, 50, -0, -0" show="0" display ="0" animate="1">
+      <text pos="|-0, |-0" offset="-0.5, -0.5" font="adding:11" colorText="@color/black" align="center">正在刷新列表中...</text>
+    </window>
   </window>
 </include>

@@ -1,4 +1,4 @@
-﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="920" height="580"  minsize="920,580" margin="5,5,5,5"  resizable="1" wndType="appMain" appWnd="1" translucent="1">
+﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="920" height="620"  minsize="920,620" margin="5,5,5,5"  resizable="1" wndType="appMain" appWnd="1" translucent="1">
   
   <root skin="_skin.bg" cache="1">
     <caption pos="0,0,-0,40" show="1" font="adding:0">
@@ -10,18 +10,139 @@
       <imgbtn name="btn_min" skin="_skin.sysbtn_min" pos="-111,0" animate="1" />
     </caption>
     
-    <tabctrl name="irm_main" pos="2,[0,-2,-2" animateSteps="10" animateType="1" tabAlign="left"  tabWidth="0" tabHeight="0">
-      <page title="tab_page">
-        <include src="layout:XML_TABWND"/>
-      </page>
-      <page title="camralist_page">
-        <include src="layout:XML_CAMERALISTWND"/>
-      </page>      
-      <page title="camrainfo_page">
-        <include src="layout:XML_CAMERAINFOWND"/>
-      </page>      
+    <tabctrl2 name="tab_main" tabPos="198" tabAlign="top" colorText="#ffffff" pos="2,40,-2,-2" show="1" curSel="0" focusable="0" tabHeight="68" tabSkin="_skin.tab_main" iconSkin="_skin.tab_icon" text-y="45" icon-x="35" tabInterSize="90">
+      <page2 title="摄像机设置" tip="摄像机设置" ani_in="skin.camera.hover" ani_out="skin.camera.leave">
+
+        <tabctrl name="irm_main" pos="0,[0,-0,-0" animateSteps="10" animateType="1" tabAlign="left"  tabWidth="0" tabHeight="0">
+          <page title="tab_page">
+            <include src="layout:XML_TABWND"/>
+          </page>
+          <page title="camralist_page">
+            <include src="layout:XML_CAMERALISTWND"/>
+          </page>      
+          <page title="camrainfo_page">
+            <include src="layout:XML_CAMERAINFOWND"/>
+          </page>      
       
-    </tabctrl>
+        </tabctrl>
+      </page2>
+      <page2 title="本机服务设置" tip="本机服务设置" ani_in="skin.server.hover" ani_out="skin.server.leave" interval="50">
+        <window pos="0,0,-0,-0" layout="center" skin="_skin.white_bg" colorText="@color/black">
+          <text pos="|0, 54" offset="-0.5,-0.5" font="adding:11" >开始设置将本机作为图片接收服务器</text>
+          <text pos="40, [20">图片接收服务器</text>
+          <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
+          <text pos="|-20,[10" size="120, 30" name="server_status" colorText="@color/red">服务已停止</text>
+          <imgbtn pos="|-160,[10" size="120, 30" skin="btn.blue_upright" colorText="@color/white" name="start_server" >启动服务</imgbtn>
+          <imgbtn pos="|60,{0" size="120, 30" skin="btn.white" name="stop_server" >停止服务</imgbtn>
+          <text pos="40,[10">图片服务器设置</text>
+          <hr pos="[30,{8,-100,@2" lineStyle="solid" mode="horizontal" colorLine="@color/brown" size="1"/>
+          <text pos="|-260,[10" size="140, 30" align="right">存储路径</text>
+          <edit name="edit_picture_path" pos="[40,{2" size="260,26" extend="2" class="cls_edit" cueText="C:\jpg"></edit>
+          <imgbtn name="btn_picture_path" pos="[10,{1" size="60,24" skin="btn.blue_upleft" colorText="@color/white">选取路径</imgbtn>
+
+          <text pos="|-260,[10" size="140, 30" align="right">服务器的端口</text>
+          <edit name="edit_server_port" number="1" pos="[40,{2" size="260,26" extend="2" class="cls_edit" cueText="端口号"></edit>
+
+          <text pos="|-260,[10" size="140, 30" align="right">启动后自动运行</text>
+          <combobox name="cbx_autorun"  pos="[40,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+            <liststyle class="cls_box">
+            </liststyle>
+            <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
+            <items>
+              <item text=" 不启用" />
+              <item text=" 启用" />
+            </items>
+          </combobox>
+          <text pos="|-260,[10" size="140, 30" align="right">启动目录浏览</text>
+          <combobox name="cbx_dirbrowse"  pos="[40,{2" size="120,26" extend="2" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+            <liststyle class="cls_box">
+            </liststyle>
+            <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
+            <items>
+              <item text=" 不启用" />
+              <item text=" 启用" />
+            </items>
+          </combobox>
+          <imgbtn name="btn_set_server" skin="btn.blue_little" pos="|0,[60" offset="-0.5,-0.5" align="center" colorText="@color/white">开始设置</imgbtn>
+        </window>
+      </page2>
+      <page2 title="添加摄像机" tip="添加摄像机" ani_in="skin.add.hover" ani_out="skin.add.leave" interval="50">
+        <window pos="0,0,-0,-0" layout="center" skin="_skin.white_bg" colorText="@color/black">
+          <text pos="|20, 54" offset="-0.5,-0.5" font="adding:11" >开始添加设备</text>
+          <text pos="|-25,90" size="120, 30" name="server_status" colorText="@color/red">仅支持有线添加</text>
+          <window pos="|-260,140">
+            <img  pos="0,0" name="step1" show="0" skin="skin.step1"></img>
+            <img  pos="0,0" name="current_step1" show="1" skin="skin.current_step1"></img>
+            <text pos="[5,{0">登陆爱耳目账号</text>
+            <img  pos="150,0" name="step2" show="1" skin="skin.step2"></img>
+            <img  pos="150,0" name="current_step2" show="0" skin="skin.current_step2"></img>
+            <text pos="[5,{0">注册摄像机</text>
+            <img  pos="300,0" name="step3" show="1" skin="skin.step3"></img>
+            <img  pos="300,0" name="current_step3" show="0" skin="skin.current_step3"></img>
+            <text pos="[5,{0">网络配置</text>
+            <img  pos="450,0" name="step4" show="1" skin="skin.step4"></img>
+            <img  pos="450,0" name="current_step4" show="0" skin="skin.current_step4"></img>
+            <text pos="[5,{0">摄像机上线</text>
+          </window>
+          <window name="step0_operation" pos="0, 200, -0, -0" show="0">
+            <text name="txt_tip" pos="|-200,[10" width="400" align="center" colorText="@color/blue" font="adding:20">请稍后...</text>
+          </window>
+
+          <window name="step1_operation" pos="0, 200, -0, -0" show="1">
+            <edit name="edit_step1_username" class="cls_edit" pos="|-100,0" width="260" height="30" colorText="@color/black" cueText="邮箱/手机号"></edit>
+            <edit name="edit_step1_passwd" class="cls_edit" pos="|-100,[10" password="1" width="260" height="30" colorText="@color/black" cueText="登录密码"></edit>
+            <imgbtn name="btn_step1" skin="btn.blue_little" pos="|30,[60" offset="-0.5,-0.5" align="center" colorText="@color/white">登录</imgbtn>
+            <link pos="|5,[20" cursor="hand" href="https://passport.iermu.com/register?redirect=http://www.iermu.com/profile">注册账号</link>
+          </window>
+
+          <window name="step2_operation" pos="0, 200, -0, -0" show="0">
+            <text pos="|-200,0" width="80" height="30" align="right">设备号</text>
+            <edit name="edit_step2_device" class="cls_edit" number="1" pos="[20,{0" width="260" height="30" colorText="@color/black" cueText="请输入设备号"></edit>
+            <text pos="|-200,[10" width="80" height="30" align="right">云平台类型</text>
+            <combobox name="cbx_step2_cloud"  pos="[20,{0" size="260,26" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+              <liststyle class="cls_box">
+              </liststyle>
+              <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
+              <items>
+                <item text=" 羚羊云" />
+                <item text=" 百度云" />
+              </items>
+            </combobox>
+            <imgbtn name="cancel_step2" skin="btn.blue_little" pos="|-140,[60" align="center" colorText="@color/white">注销设备</imgbtn>
+            <imgbtn name="btn_step2" skin="btn.blue_little" pos="|40,{0" align="center" colorText="@color/white">下一步</imgbtn>
+            <link name="jump_step2" pos="|-20,[20" cursor="hand">已注册跳过</link>
+          </window>
+
+          <window name="step3_operation" pos="0, 200, -0, -0" show="0">
+            <text pos="|-200,0" width="80" height="30" align="right">网络配置</text>
+            <combobox name="cbx_step3_net" pos="[20,{2" size="260,26" class="cls_box" btnSkin="_skin.sysbtn_drop_little" dropDown="1" dropHeight="100" animateTime="100" curSel="0" focusable="0">
+              <liststyle class="cls_box">
+              </liststyle>
+              <editstyle inset="5,0,5,0" colorText="#000000" colorBkgnd="#FFFFFF"/>
+              <items>
+                <item text=" 使用DHCP" />
+                <item text=" 手动固定IP" />
+              </items>
+            </combobox>
+            <window name="wnd_step3_ip" pos="|-200,[10" show="0">
+              <text pos="0, 0" width="80" height="30" align="right">IP地址</text>
+              <edit name="edit_step3_ip" class="cls_edit" pos="[20,{0" width="260" height="30" colorText="@color/black" cueText="请输入IP地址"></edit>
+            </window>
+            <imgbtn name="btn_step3" skin="btn.blue_little" pos="|30,[60" offset="-0.5,-0.5" align="center" colorText="@color/white">下一步</imgbtn>
+          </window>
+
+          <window name="step4_operation" pos="0, 200, -0, -0" show="0">
+            <text name="step4_deviceid" pos="|-100,[10" colorText="@color/blue" font="adding:20">设备</text>
+            <text pos="|-60,[10" colorText="@color/blue" font="adding:20">成功上线</text>
+            <imgbtn name="btn_step4" skin="btn.blue_little" pos="|30,[60" offset="-0.5,-0.5" align="center" colorText="@color/white">继续添加</imgbtn>
+          </window>
+        </window>
+      </page2>
+    </tabctrl2>
+
+    <imgbtn name="btn_camerainfo_back" skin="btn.back" pos="10, 80" show="0"></imgbtn>
+    <imgbtn name="btn_camerainfo_pre" skin="btn.pre" pos="[1, {0" show="0"></imgbtn>
+
   </root>
   
 </SOUI>
