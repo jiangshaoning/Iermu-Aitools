@@ -3,10 +3,10 @@
   <window pos="0, [0, -0, -0" colorBkgnd="@color/white" colorText="@color/black">
     <window pos="0, 0, 50, 420" font="adding:6">
       <text pos="50, 10">本机IP:</text>
-      <text pos="[1, {0" name="txt_lanip" width="110" align="center">127.0.0.1</text>
+      <text pos="[1, {0" name="txt_lanip" width="160" align="center">127.0.0.1</text>
       <text pos="[1, {0">同一局域网内的摄像机</text>
     </window>
-    <imgbtn name="btn_camerainfo_ref" skin="btn.ref" pos="420, 13"></imgbtn>
+    <imgbtn name="btn_camerainfo_ref" skin="btn.ref" pos="470, 13"></imgbtn>
     
     <mclistview name="cameralist_win" pos="0,50,-0,-0" headerHeight="50" show="1">
       <header align="center" matchParent="1" sortSkin="_skin_lcex_header_arrow" itemSkin="_skin_lcex_header" itemSwapEnable="1" colorText="@color/black" fixWidth="0" wantTab="1" sortHeader="1" colorBkgnd="#ffffff" >

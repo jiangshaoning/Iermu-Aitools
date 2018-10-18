@@ -158,7 +158,6 @@ private:
 	BOOL					m_bLayoutInited;
 	string					m_localIp;
 	string					m_cameraIp;
-	//string					m_uid;
 	string					m_token;
 	SocketData				m_data;
 	BOOL					m_menushow;			//选取本机IP的点击显示或隐藏

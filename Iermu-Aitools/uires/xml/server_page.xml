@@ -13,7 +13,7 @@
     <edit name="edit_secret_key" pos="|-160,90" size="260,22" class="cls_edit" cueText="SECRET_KEY"></edit>
     <edit name="edit_bd_libname" pos="|-160,120" size="260,22" class="cls_edit" cueText="库名"></edit>
       
-    <radio pos="|-180,150" class="cls_radio" name="radio_6">深网比对服务器</radio>
+    <radio pos="|-180,150" class="cls_radio" id="1" name="radio_6">深网比对服务器</radio>
     <edit name="edit_sw_server" pos="|-160,175" size="260,22" class="cls_edit" cueText="服务器地址"></edit>
     <text pos="[5,{0">:</text>
     <edit name="edit_sw_port" pos="[5,{0" size="60,22" class="cls_edit" cueText="端口号"  align="center"></edit>
@@ -27,7 +27,7 @@
         <item text=" 动态库" />
       </items>
     </combobox>
-    <radio pos="|-180,{0" class="cls_radio" name="radio_7" id="1" show="0">深醒比对服务器</radio>
+    <radio pos="|-180,{0" class="cls_radio" name="radio_7" show="0">深醒比对服务器</radio>
     <!--******************************图片比对服务器******************************-->
 
 

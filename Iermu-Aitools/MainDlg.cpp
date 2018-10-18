@@ -173,6 +173,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	InitServer();
 	//SetLocalIPView();
 	InitSetEvent();
+	m_curSel = -1;
 	return 0;
 }
 //TODO:消息映射
@@ -245,7 +246,8 @@ void CMainDlg::GoToCameraListPage()
 			m_pAdapter->SetTags(m_iplist);
 			m_pAdapter->Release();
 		}
-
+		
+		FindChildByName2<SWindow>("txt_lanip")->SetWindowTextW(S_CA2T(m_localIp.c_str()));
 		pTab->SetCurSel(_T("camralist_page"));
 		SetDisplayProgress(L"local_ip_win", L"local_ip_progress");
 	}
@@ -1105,7 +1107,7 @@ bool CMainDlg::SetCameraServer()
 		if (sw_libname.length() > 0)
 			memcpy(m_cinfo.ipp.sw_id, sw_libname.c_str(), sw_libname.length());
 
-		m_cinfo.ipp.lib_type |= FindChildByName2<SComboBox>(L"cbx_sw_lib")->GetCurSel() & 1;
+		FindChildByName2<SComboBox>(L"cbx_sw_lib")->GetCurSel() ? (m_cinfo.ipp.lib_type |= 1) : (m_cinfo.ipp.lib_type &= 0);
 	}
 
 
@@ -1137,7 +1139,7 @@ bool CMainDlg::SetCameraServer()
 		m_cinfo.ipp.port = port;
 
 		SCheckBox *check_general_https = FindChildByName2<SCheckBox>(L"check_general_https");
-		m_cinfo.ipp.lib_type |= (check_general_https->IsChecked() ? (1 << 7) : 0);
+		check_general_https->IsChecked() ? (m_cinfo.ipp.lib_type |= (1 << 7)) : (m_cinfo.ipp.lib_type &= 0);
 	}
 
 	//图片上传服务器Iermu版
@@ -1225,14 +1227,29 @@ bool CMainDlg::SetCameraStore()
 	{
 		if (!((swscanf(tjpgmem, L"%d.%d", &jpgmem, &decimal) == 1 || swscanf(tjpgmem, L"%d.%d", &jpgmem, &decimal) == 2) && (jpgmem >= 0 && jpgmem <= 0xffff)))
 		{
-			MessageBox(NULL, _T("是否只抓正脸输入格式不正确"), _T("提示"), MB_OK | MB_ICONERROR);
+			MessageBox(NULL, _T("人脸图片存储大小格式不正确"), _T("提示"), MB_OK | MB_ICONERROR);
 			return false;
 		}
 	}
 
+	string sjpgmem = S_CT2A(tjpgmem);
+	double djpgmem = atof(sjpgmem.c_str());
+	if (djpgmem > -0.0000001 && djpgmem < 0.000001)
+		jpgmem = 2;
+	else if (djpgmem >= 1)
+		jpgmem = (unsigned int)djpgmem;
+	else
+		jpgmem = 0;
+
 	//NAS 开关
 	m_cinfo.np.status = FindChildByName2<SCheckBox>(L"check_switch_nas")->IsChecked() & 1;
 	m_cinfo.np.status = m_cinfo.np.status | (1 << 7); //SAMBA
+
+	if (jpgmem >= space && m_cinfo.np.status & 1)
+	{
+		MessageBox(NULL, _T("NAS分配空间大小必须大于2G并且大于人脸图片存储大小"), _T("提示"), MB_OK | MB_ICONERROR);
+		return false;
+	}
 
 	//NAS IP
 	m_cinfo.np.ip[0] = a;
@@ -1283,15 +1300,6 @@ bool CMainDlg::SetCameraStore()
 	m_cinfo.af.lan |= (cbx_switch_saveface << 5);
 
 	//人脸图片存储大小
-	string sjpgmem = S_CT2A(tjpgmem);
-	double djpgmem = atof(sjpgmem.c_str());
-	if (djpgmem > -0.0000001 && djpgmem < 0.000001)
-		jpgmem = 2;
-	else if (djpgmem >= 1)
-		jpgmem = (unsigned int)djpgmem;
-	else
-		jpgmem = 0;
-
 	if (jpgmem >= 1)
 		m_cinfo.af.jpgmem = jpgmem | (1 << 15);
 	else
@@ -1383,7 +1391,7 @@ void CMainDlg::RefreshCameraList()
 
 void CMainDlg::OnOpenPlay(int voiceType)
 {
-	m_dlgPlayer.Create(m_hWnd);
+	m_dlgPlayer.Create(NULL);
 	m_dlgPlayer.SetPlayUrl(m_cinfo.cad.url, voiceType);
 	m_dlgPlayer.SendMessage(WM_INITDIALOG);
 	m_dlgPlayer.CenterWindow(m_dlgPlayer.m_hWnd);
@@ -1635,8 +1643,8 @@ void CMainDlg::OnStepOne()
 	data.append("&mobile=").append(usr).append("&password=").append(passwd);
 
 	//开启线程发送命令
-	SendCMD(OPT_LOGIN, POST, AUTHORIZATION_URL, data);
-	OnStepChange(1, 0, L"登录中");
+	if (SendCMD(OPT_LOGIN, POST, AUTHORIZATION_URL, data))
+		OnStepChange(1, 0, L"登录中");
 }
 
 void CMainDlg::OnCancelTwo()
@@ -1651,8 +1659,8 @@ void CMainDlg::OnCancelTwo()
 	string data = "deviceid=";
 	data.append(m_deviceId).append("&method=drop&access_token=").append(m_token);
 	//开启线程发送命令
-	SendCMD(OPT_CANCELLATION, POST, GETDEVICEINFO_URL, data);
-	OnStepChange(2, 0, L"正在注消摄像机");
+	if (SendCMD(OPT_CANCELLATION, POST, GETDEVICEINFO_URL, data))
+		OnStepChange(2, 0, L"正在注消摄像机");
 }
 
 void CMainDlg::OnStepTwo()
@@ -1670,8 +1678,8 @@ void CMainDlg::OnStepTwo()
 	data.append(m_deviceId).append("&device_type=1&desc=%e6%88%91%e7%9a%84%e6%91%84%e5%83%8f%e6%9c%ba&connect_type=").append(to_string(connect_type)).append("&method=register&access_token=").append(m_token);
 
 	//开启线程发送命令
-	SendCMD(OPT_REGISTRE, POST, GETDEVICEINFO_URL, data);
-	OnStepChange(2, 0, L"正在注册摄像机");
+	if(SendCMD(OPT_REGISTRE, POST, GETDEVICEINFO_URL, data))
+		OnStepChange(2, 0, L"正在注册摄像机");
 }
 
 void CMainDlg::OnJumpTwo()
@@ -1902,9 +1910,9 @@ UINT CMainDlg::Run(LPVOID data)
 				break;
 			if (!(pEvt->retOK = client.SetRec(m_cameraIp.c_str(), m_cinfo.rec, true)))
 				break;
+
 			//配置NAS
-			if (!(pEvt->retOK = client.SetNAS(m_cameraIp.c_str(), m_cinfo.np, false)))
-				break;
+			client.SetNAS(m_cameraIp.c_str(), m_cinfo.np, false);
 
 			if (m_cinfo.np.status & 1)
 			{
@@ -2055,6 +2063,7 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 				MessageBox(NULL, _T("获取配置失败！"), _T("提示"), MB_OK | MB_ICONERROR);
 				return false;
 			}
+			m_curSel = -1;
 			GoToCameraInfoPage();
 			SetDisplayBackBtn(0, TRUE, INFO_WND);
 			break;
@@ -2067,7 +2076,8 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 			else
 			{
 				//m_cinfolist.RemoveAt(m_curSel);
-				m_cinfolist.SetAt(m_curSel, m_cinfo);
+				if (m_curSel>=0)
+					m_cinfolist.SetAt(m_curSel, m_cinfo);
 				MessageBox(NULL, _T("设置通用参数成功！"), _T("提示"), MB_OK);
 			}
 
@@ -2080,7 +2090,8 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 			}
 			else
 			{
-				m_cinfolist.SetAt(m_curSel, m_cinfo);
+				if (m_curSel >= 0)
+					m_cinfolist.SetAt(m_curSel, m_cinfo);
 				MessageBox(NULL, _T("设置服务参数成功！"), _T("提示"), MB_OK);
 			}
 
@@ -2093,7 +2104,8 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 			}
 			else
 			{
-				m_cinfolist.SetAt(m_curSel, m_cinfo);
+				if (m_curSel >= 0)
+					m_cinfolist.SetAt(m_curSel, m_cinfo);
 				MessageBox(NULL, SStringT().Format(_T("设置储存参数成功！%s"), pEvt->nData), _T("提示"), MB_OK);
 			}
 
@@ -2106,7 +2118,8 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 			}
 			else
 			{
-				m_cinfolist.SetAt(m_curSel, m_cinfo);
+				if (m_curSel >= 0)
+					m_cinfolist.SetAt(m_curSel, m_cinfo);
 				MessageBox(NULL, _T("设置其他参数成功！"), _T("提示"), MB_OK);
 			}
 
