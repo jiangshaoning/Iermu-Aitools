@@ -1297,7 +1297,7 @@ bool CMainDlg::SetCameraStore()
 
 	//»À¡≥Õº∆¨±æµÿ¥¢¥Ê
 	UINT8 cbx_switch_saveface = FindChildByName2<SComboBox>(L"cbx_switch_saveface")->GetCurSel() & 1;
-	m_cinfo.af.lan |= (cbx_switch_saveface << 5);
+	cbx_switch_saveface ? (m_cinfo.af.lan |= (cbx_switch_saveface << 5)) : (m_cinfo.af.lan &= (cbx_switch_saveface << 5));
 
 	//»À¡≥Õº∆¨¥Ê¥¢¥Û–°
 	if (jpgmem >= 1)
@@ -1316,7 +1316,8 @@ bool CMainDlg::SetCameraOther()
 	//ŒﬁÕ¯¬Á
 	UINT8 cbx_network = FindChildByName2<SComboBox>(L"cbx_network")->GetCurSel() & 1;
 
-	m_cinfo.af.lan |= ((cbx_lan << 7) | (cbx_network << 6));
+	cbx_lan ? (m_cinfo.af.lan |= (cbx_lan << 7)) : (m_cinfo.af.lan &= (cbx_lan << 7));
+	cbx_network ? (m_cinfo.af.lan |= (cbx_network << 6)) : (m_cinfo.af.lan &= (cbx_network << 6));
 
 	return SendCMD(OPT_SETCAMERA_OTHER, (REQUEST_TYPE)0, "", "");
 }
@@ -1905,6 +1906,7 @@ UINT CMainDlg::Run(LPVOID data)
 		case OPT_SETCAMERA_STORE:
 		{
 			WinSocketClient client;
+			bool ret;
 
 			if (!(pEvt->retOK = client.SetAIFunction(m_cameraIp.c_str(), m_cinfo.af, false)))
 				break;
@@ -1912,10 +1914,15 @@ UINT CMainDlg::Run(LPVOID data)
 				break;
 
 			//≈‰÷√NAS
-			client.SetNAS(m_cameraIp.c_str(), m_cinfo.np, false);
+			ret = client.SetNAS(m_cameraIp.c_str(), m_cinfo.np, false);
 
 			if (m_cinfo.np.status & 1)
 			{
+				if (!ret)
+				{
+					pEvt->retOK = ret;
+					break;
+				}
 				if (!(pEvt->retOK = GetNASError(client, pEvt->nData)))
 					break;
 
