@@ -703,6 +703,46 @@ bool WinSocketClient::SetCameraNET(const char *ip, CameraNet &net, bool save)
 }
 
 
+bool WinSocketClient::GetCameraStore(const char *ip, int totalSpace)
+{
+	bool ret;
+
+	char cmdsetIP[4] = { 0 };
+	short int iplen = 0;
+	char databuf[256] = { 0 };
+
+	//…Ë÷√IP
+	cmdsetIP[0] = 74;
+	cmdsetIP[1] = 1;
+	memcpy(cmdsetIP + 2, &iplen, 2);
+	ret = SendBuffToHost(ip, cmdsetIP, sizeof(cmdsetIP), databuf, false);
+	if (ret)
+	{
+		int total = ntohl(*((unsigned int *)(databuf + 20)))/100;
+		if (total<4)
+			totalSpace = 0;
+		else if (total<6)
+			totalSpace = 4;
+		else if (total >= 6 && total<12)
+			totalSpace = 8;
+		else if (total >= 12 && total<24)
+			totalSpace = 16;
+		else if (total >= 24 && total<48)
+			totalSpace = 32;
+		else if (total >= 48 && total<96)
+			totalSpace = 64;
+		else if (total >= 96 && total<192)
+			totalSpace = 128;
+		else if (total >= 192 && total<384)
+			totalSpace = 256;
+		else if (total >= 384 && total<768)
+			totalSpace = 512;
+		else
+			totalSpace = 0;
+
+	}
+	return ret;
+}
 
 //bool WinSocketClient::GetPanorama(const char *ip, string &panoTemplate)
 //{

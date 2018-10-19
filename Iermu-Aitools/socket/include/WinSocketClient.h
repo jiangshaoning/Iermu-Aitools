@@ -161,6 +161,7 @@ typedef struct
 	AIFunction af;
 	NASParameter np;
 	RECParameter rec;
+	int totalspace;
 }AICameraInfo;
 
 //在MainDlg中使用SNotifyCenter的通知的异步事件 
@@ -222,5 +223,7 @@ public:
 	bool GetCameraNET(const char *ip, CameraNet &net);
 	bool SetCameraNET(const char *ip, CameraNet &net, bool save);
 
+	//获取磁盘总空间
+	bool GetCameraStore(const char *ip, int totalSpace);
 	//bool GetPanorama(const char *ip, string &panoTemplate);
 };

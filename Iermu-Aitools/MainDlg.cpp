@@ -223,7 +223,7 @@ void CMainDlg::GoToCameraInfoPage()
 	STabCtrl *pTab = FindChildByName2<STabCtrl>(L"irm_main");
 	if (pTab)
 	{
-		SetLocalIPView();
+		//SetLocalIPView();
 		UpdateCameraInfo();
 		pTab->SetCurSel(_T("camrainfo_page"));
 		SetDisplayProgress(L"camera_ip_win", L"camera_ip_progress");
@@ -323,17 +323,7 @@ int CMainDlg::GetLocalIPInfo(SArray<UserInfo> &Info)
 
 void CMainDlg::SetLocalIPView(void)
 {
-	//GetLocalIPInfo(m_userInfo);
-	//SComboView *pComboView = FindChildByName2<SComboView>(L"cbv_account");
-	//if (pComboView)
-	//{
-	//	SListView *pLstView = pComboView->GetListView();
-	//	CBVAdapterFix *pAdapter = new CBVAdapterFix(m_userInfo);
-	//	pLstView->SetAdapter(pAdapter);
-	//	pAdapter->Release();
-	//	pComboView->SetCurSel(-1);
-	//}
-
+	GetLocalIPInfo(m_userInfo);
 	SListView *pLstLocalIP = FindChildByName2<SListView>("list_local_ip");
 	if (pLstLocalIP)
 	{
@@ -491,6 +481,7 @@ void CMainDlg::GetTime(DateTime &dt)
 
 void CMainDlg::OnMenuShowLocalIP()
 {
+	SetLocalIPView();
 	SListView *pLstLocalIP = FindChildByName2<SListView>("list_local_ip");
 	pLstLocalIP->SetVisible(TRUE, TRUE);
 
@@ -1107,7 +1098,7 @@ bool CMainDlg::SetCameraServer()
 		if (sw_libname.length() > 0)
 			memcpy(m_cinfo.ipp.sw_id, sw_libname.c_str(), sw_libname.length());
 
-		FindChildByName2<SComboBox>(L"cbx_sw_lib")->GetCurSel() ? (m_cinfo.ipp.lib_type |= 1) : (m_cinfo.ipp.lib_type &= 0);
+		FindChildByName2<SComboBox>(L"cbx_sw_lib")->GetCurSel() ? (m_cinfo.ipp.lib_type |= 1) : (m_cinfo.ipp.lib_type &= ~1);
 	}
 
 
@@ -1139,7 +1130,7 @@ bool CMainDlg::SetCameraServer()
 		m_cinfo.ipp.port = port;
 
 		SCheckBox *check_general_https = FindChildByName2<SCheckBox>(L"check_general_https");
-		check_general_https->IsChecked() ? (m_cinfo.ipp.lib_type |= (1 << 7)) : (m_cinfo.ipp.lib_type &= 0);
+		check_general_https->IsChecked() ? (m_cinfo.ipp.lib_type |= (1 << 7)) : (m_cinfo.ipp.lib_type &= ~(1 << 7));
 	}
 
 	//图片上传服务器Iermu版
@@ -1297,7 +1288,7 @@ bool CMainDlg::SetCameraStore()
 
 	//人脸图片本地储存
 	UINT8 cbx_switch_saveface = FindChildByName2<SComboBox>(L"cbx_switch_saveface")->GetCurSel() & 1;
-	cbx_switch_saveface ? (m_cinfo.af.lan |= (cbx_switch_saveface << 5)) : (m_cinfo.af.lan &= (cbx_switch_saveface << 5));
+	cbx_switch_saveface ? (m_cinfo.af.lan |= (cbx_switch_saveface << 5)) : (m_cinfo.af.lan &= ~(cbx_switch_saveface << 5));
 
 	//人脸图片存储大小
 	if (jpgmem >= 1)
@@ -1316,8 +1307,8 @@ bool CMainDlg::SetCameraOther()
 	//无网络
 	UINT8 cbx_network = FindChildByName2<SComboBox>(L"cbx_network")->GetCurSel() & 1;
 
-	cbx_lan ? (m_cinfo.af.lan |= (cbx_lan << 7)) : (m_cinfo.af.lan &= (cbx_lan << 7));
-	cbx_network ? (m_cinfo.af.lan |= (cbx_network << 6)) : (m_cinfo.af.lan &= (cbx_network << 6));
+	cbx_lan ? (m_cinfo.af.lan |= (1 << 7)) : (m_cinfo.af.lan &= ~(1 << 7));
+	cbx_network ? (m_cinfo.af.lan |= (1 << 6)) : (m_cinfo.af.lan &= ~(1 << 6));
 
 	return SendCMD(OPT_SETCAMERA_OTHER, (REQUEST_TYPE)0, "", "");
 }
@@ -1877,6 +1868,8 @@ UINT CMainDlg::Run(LPVOID data)
 				break;
 			if (!(pEvt->retOK = client.GetNAS(m_cameraIp.c_str(), m_cinfo.np)))
 				break;
+			//if (!(pEvt->retOK = client.GetCameraStore(m_cameraIp.c_str(), m_cinfo.totalspace)))
+			//	break;
 			pEvt->retOK = client.GetRec(m_cameraIp.c_str(), m_cinfo.rec);
 			break;
 		}
@@ -1907,6 +1900,12 @@ UINT CMainDlg::Run(LPVOID data)
 		{
 			WinSocketClient client;
 			bool ret;
+
+			//if (!(m_cinfo.np.status & 1))
+			//{
+			//	if (!(pEvt->retOK = client.GetCameraStore(m_cameraIp.c_str(), m_cinfo.totalspace)))
+			//		break;
+			//}
 
 			if (!(pEvt->retOK = client.SetAIFunction(m_cameraIp.c_str(), m_cinfo.af, false)))
 				break;
