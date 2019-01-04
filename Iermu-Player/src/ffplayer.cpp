@@ -383,7 +383,7 @@ static int player_prepare(PLAYER *player)
 	av_dict_set(&opts, "preset", "superfast", 0);
 	av_dict_set(&opts, "buff_size", "0", 0);
 	av_dict_set(&opts, "stimeout", "10000000", 0);
-	av_dict_set(&opts, "fflags", "nobuffer", 0);
+	//av_dict_set(&opts, "fflags", "nobuffer", 0); //不能加
 	av_dict_set(&opts, "network-caching", 0, 0);
 	av_dict_set(&opts, "analyzemaxduration", "0", 0);
 	av_dict_set(&opts, "tune", "zerolatency", 0);

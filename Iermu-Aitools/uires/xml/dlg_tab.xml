@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <include>
-    <tabctrl pos="0,[0,-0,-0" show="1" blackcurSel="0" focusable="0" animateSteps="10" animateType="1" tabSkin="_skin.page_main" tabAlign="left" text-x="10" tabWidth="200" tabHeight="60" colorBkgnd="@color/white" colorText="@color/black" colorTextHover="@color/blue" colorTextPush="@color/blue">
+    <tabctrl pos="0,[0,-0,-0" show="1" curSel="0" focusable="0" animateSteps="10" animateType="1" tabSkin="_skin.page_main" tabAlign="left" text-x="10" tabWidth="200" tabHeight="60" colorBkgnd="@color/white" colorText="@color/black" colorTextHover="@color/blue" colorTextPush="@color/blue">
 
       <page title="通过本机IP搜索设备">
         <window name="local_ip_win" pos="0,0,-0,-0" layout="center" skin="_skin.white_bg" show="1">

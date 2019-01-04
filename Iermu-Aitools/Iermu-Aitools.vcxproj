@@ -303,7 +303,9 @@
     <Xml Include="uires\xml\dlg_tab.xml">
       <SubType>Designer</SubType>
     </Xml>
-    <Xml Include="uires\xml\general_page.xml" />
+    <Xml Include="uires\xml\general_page.xml">
+      <SubType>Designer</SubType>
+    </Xml>
     <Xml Include="uires\xml\other_page.xml">
       <SubType>Designer</SubType>
     </Xml>

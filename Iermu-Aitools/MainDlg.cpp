@@ -1288,7 +1288,7 @@ bool CMainDlg::SetCameraStore()
 
 	//人脸图片本地储存
 	UINT8 cbx_switch_saveface = FindChildByName2<SComboBox>(L"cbx_switch_saveface")->GetCurSel() & 1;
-	cbx_switch_saveface ? (m_cinfo.af.lan |= (cbx_switch_saveface << 5)) : (m_cinfo.af.lan &= ~(cbx_switch_saveface << 5));
+	cbx_switch_saveface ? (m_cinfo.af.lan |= (1 << 5)) : (m_cinfo.af.lan &= ~(1 << 5));
 
 	//人脸图片存储大小
 	if (jpgmem >= 1)
@@ -1944,12 +1944,12 @@ UINT CMainDlg::Run(LPVOID data)
 		case OPT_FORMAT_SDCARD:
 		{
 			WinSocketClient client;
-			pEvt->progress = 0;
+			pEvt->progress = -1;
 			if (!(pEvt->retOK = client.SetFormateSDCard(m_cameraIp.c_str())))
 				break;
 				
-			while ((pEvt->retOK = client.GetFormateSDCard(m_cameraIp.c_str(), pEvt->progress)) && pEvt->progress < 1000)
-			{
+			while ((pEvt->retOK = client.GetFormateSDCard(m_cameraIp.c_str(), pEvt->progress)) && pEvt->progress >= 0 && pEvt->progress < 1000)
+			{				
 				SNotifyCenter::getSingleton().FireEventAsync(pEvt);
 			}
 			break;
@@ -2033,7 +2033,8 @@ bool CMainDlg::OnStartSocketThread(LPVOID data)
 {
 	if (IsRunning())
 	{
-		MessageBox(NULL, _T("操作太频繁，请稍后再试！"), _T("提示"), MB_OK | MB_ICONERROR);
+		//MessageBox(NULL, _T("操作太频繁，请稍后再试！"), _T("提示"), MB_OK | MB_ICONERROR);
+		SMessageBox(NULL, _T("操作太频繁，请稍后再试！"), _T("提示"), MB_OK);
 		return false;
 	}
 	SNotifyCenter::getSingleton().addEvent(EVENTID(MainSocketThread));
@@ -2053,6 +2054,7 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 		case OPT_GETCAMERA_LIST:
 			if (!pEvt->retOK || !m_cinfolist.GetCount())
 			{
+				m_cinfolist.RemoveAll();
 				SetDisplayProgress(L"cameralist_win", L"refresh_progress");
 				SetDisplayProgress(L"local_ip_win", L"local_ip_progress");
 				MessageBox(NULL, _T("没有获取到局域网的设备，\n请确保局域网内有AI摄像机"), _T("提示"), MB_OK | MB_ICONERROR);
@@ -2145,6 +2147,12 @@ bool CMainDlg::OnMainSocketThread(EventArgs *e)
 					SLOGFMTE("#################SD卡格式化进度=====: %d\n", pEvt->progress);
 					break;
 				}
+				else if (pEvt->progress < 0)
+				{
+					MessageBox(NULL, _T("SD卡格式化失败，可能未插入SD卡！"), _T("提示"), MB_OK);
+					break;
+				}
+
 				text_formate_progress->SetWindowTextW(SStringT().Format(_T("%d.%d%%"), pEvt->progress / 10, pEvt->progress % 100));
 				MessageBox(NULL, _T("SD卡格式化成功！"), _T("提示"), MB_OK);
 			}
